@@ -7,18 +7,18 @@
 include $(TOPDIR)/rules.mk
 
 ARCH:=mipsel
-BOARD:=jz47x0
-BOARDNAME:=Ingenic JZ47x0
+BOARD:=xburst
+BOARDNAME:=XBurst JZ47x0
 FEATURES:=squashfs jffs2
 
-LINUX_VERSION:=2.6.24.7
+LINUX_VERSION:=2.6.28.10
 
 include $(INCLUDE_DIR)/target.mk
 
-DEFAULT_PACKAGES += hostapd-mini kmod-madwifi gpioctl
+DEFAULT_PACKAGES += gpioctl
 
 define Target/Description
-	Build firmware images for Ingenic JZ47x0 based boards.
+	Build firmware images for XBurst JZ47x0 based boards.
 endef
 
 $(eval $(call BuildTarget))
