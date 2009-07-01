@@ -1,33 +1,33 @@
---- linux-2.6.24.7.old/include/asm-mips/bootinfo.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/asm-mips/bootinfo.h	2009-04-12 18:13:57.000000000 +0200
-@@ -198,6 +198,14 @@
- #define MACH_GROUP_BRCM		23	/* Broadcom			*/
- #define  MACH_BCM47XX		1	/* Broadcom BCM47XX		*/
- 
+--- linux-2.6.24.7.old/arch/mips/include/asm/bootinfo.h	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/arch/mips/include/asm/bootinfo.h	2009-04-12 18:13:57.000000000 +0200
+@@ -57,6 +57,14 @@
+ #define MACH_MIKROTIK_RB532	0	/* Mikrotik RouterBoard 532 	*/
+ #define MACH_MIKROTIK_RB532A	1	/* Mikrotik RouterBoard 532A 	*/
+
 +/*
 + * Valid machtype for group INGENIC
 + */
-+#define  MACH_INGENIC_JZ4730	0	/* JZ4730 SOC		*/
-+#define  MACH_INGENIC_JZ4740	1	/* JZ4740 SOC		*/
-+#define  MACH_INGENIC_JZ4750	2	/* JZ4750 SOC		*/
-+#define  MACH_INGENIC_JZ4750D	3	/* JZ4750D SOC		*/
++#define  MACH_INGENIC_JZ4730	0	/* JZ4730 SOC */
++#define  MACH_INGENIC_JZ4740	1	/* JZ4740 SOC */
++#define  MACH_INGENIC_JZ4750	2	/* JZ4750 SOC */
++#define  MACH_INGENIC_JZ4750D	3	/* JZ4750D SOC */
 +
  #define CL_SIZE			COMMAND_LINE_SIZE
- 
- const char *get_system_type(void);
---- linux-2.6.24.7.old/include/asm-mips/cpu.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/asm-mips/cpu.h	2009-04-12 18:13:57.000000000 +0200
+
+ extern char *system_type;
+--- linux-2.6.24.7.old/arch/mips/include/asm/cpu.h	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/arch/mips/include/asm/cpu.h	2009-04-12 18:13:57.000000000 +0200
 @@ -33,6 +33,7 @@
  #define PRID_COMP_TOSHIBA	0x070000
  #define PRID_COMP_LSI		0x080000
  #define PRID_COMP_LEXRA		0x0b0000
 +#define PRID_COMP_INGENIC	0xd00000
- 
- 
+
+
  /*
 @@ -113,6 +114,12 @@
  #define PRID_IMP_BCM3302	0x9000
- 
+
  /*
 + * These are the PRID's for when 23:16 == PRID_COMP_INGENIC
 + */
@@ -37,11 +37,11 @@
 +/*
   * Definitions for 7:0 on legacy processors
   */
- 
+
 @@ -203,6 +210,11 @@
  	 */
  	CPU_5KC, CPU_20KC, CPU_25KF, CPU_SB1, CPU_SB1A, CPU_LOONGSON2,
- 
+
 +	/*
 +	 * Ingenic class processors
 +	 */
@@ -49,12 +49,12 @@
 +
  	CPU_LAST
  };
- 
---- linux-2.6.24.7.old/include/asm-mips/jzsoc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/jzsoc.h	2009-04-12 18:13:57.000000000 +0200
+
+--- linux-2.6.24.7.old/arch/mips/include/asm/jzsoc.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/jzsoc.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,49 @@
 +/*
-+ *  linux/include/asm-mips/jzsoc.h
++ *  linux/arch/mips/include/asm/jzsoc.h
 + *
 + *  Ingenic's JZXXXX SoC common include.
 + *
@@ -102,22 +102,22 @@
 +#define writel(b,addr)	((*(volatile unsigned int *)(addr)) = (b))
 +
 +#endif /* __ASM_JZSOC_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-generic/irq.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/asm-mips/mach-generic/irq.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-generic/irq.h	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/arch/mips/include/asm/mach-generic/irq.h	2009-04-12 18:13:57.000000000 +0200
 @@ -9,7 +9,7 @@
  #define __ASM_MACH_GENERIC_IRQ_H
- 
+
  #ifndef NR_IRQS
 -#define NR_IRQS	128
 +#define NR_IRQS	256
  #endif
- 
+
  #ifdef CONFIG_I8259
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/board-pmp.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/board-pmp.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/board-pmp.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/board-pmp.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,83 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/board-pmp.h
++ *  linux/arch/mips/include/asm/mach-jz4730/board-pmp.h
 + *
 + *  JZ4730-based PMP board ver 2.x definition.
 + *
@@ -133,14 +133,14 @@
 +#ifndef __ASM_JZ4730_PMP_H__
 +#define __ASM_JZ4730_PMP_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * EXTAL frequency
 + */
 +#define JZ_EXTAL		12000000	/* EXTAL: 12 MHz */
 +#define JZ_EXTAL2		32768		/* EXTAL2: 32.768 KHz */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_PW_I         97
@@ -154,7 +154,7 @@
 +#define GPIO_TS_PENIRQ    98
 +#define GPIO_UDC_HOTPLUG  86
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +#define MSC_WP_PIN         82
@@ -199,11 +199,11 @@
 +})
 +
 +#endif /* __ASM_JZ4730_PMP_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/clock.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/clock.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,184 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/clock.h
++ *  linux/arch/mips/include/asm/mach-jz4730/clock.h
 + *
 + *  JZ4730 clocks definition.
 + *
@@ -386,11 +386,11 @@
 +}
 +
 +#endif /* __ASM_JZ4730_CLOCK_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/dma.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,272 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/dma.h
++ *  linux/arch/mips/include/asm/mach-jz4730/dma.h
 + *
 + *  JZ4730 DMA definition.
 + *
@@ -661,11 +661,11 @@
 +}
 +
 +#endif  /* __ASM_JZ4730_DMA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/jz4730.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/jz4730.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/jz4730.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/jz4730.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,40 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/jz4730.h
++ *  linux/arch/mips/include/asm/mach-jz4730/jz4730.h
 + *
 + *  JZ4730 common definition.
 + *
@@ -704,11 +704,11 @@
 +#include <asm/mach-jz4730/serial.h>
 +
 +#endif /* __ASM_JZ4730_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/misc.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/misc.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,28 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/misc.h
++ *  linux/arch/mips/include/asm/mach-jz4730/misc.h
 + *
 + *  JZ4730 miscillaneous definitions.
 + *
@@ -735,11 +735,11 @@
 +extern int i2c_write(unsigned char, unsigned char *, unsigned char, int);
 +
 +#endif /* __ASM_JZ4730_MISC_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/ops.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/ops.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,2541 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/ops.h
++ *  linux/arch/mips/include/asm/mach-jz4730/ops.h
 + *
 + *  JZ4730 module operations definition.
 + *
@@ -2481,7 +2481,7 @@
 +	REG_AIC_ACCR1 |= AC97_PCM_XS_L_FRONT | AC97_PCM_XS_R_FRONT;	\
 +} while(0)
 +
-+/* In fact, only stereo is support now. */ 
++/* In fact, only stereo is support now. */
 +#define __ac97_set_rs_none()	( REG_AIC_ACCR1 &= ~AIC_ACCR1_RS_MASK )
 +#define __ac97_set_rs_mono() 						\
 +do {									\
@@ -2783,7 +2783,7 @@
 +#define __lcd_panel_white()		( REG_LCD_DEV |= LCD_DEV_WHITE )
 +#define __lcd_panel_black()		( REG_LCD_DEV &= ~LCD_DEV_WHITE )
 +
-+/* n=1,2,4,8 for single mono-STN 
++/* n=1,2,4,8 for single mono-STN
 + * n=4,8 for dual mono-STN
 + */
 +#define __lcd_set_panel_datawidth(n) 		\
@@ -3224,7 +3224,7 @@
 +#define __ssi_set_lsb() ( REG_SSI_CR1 |= SSI_CR1_LFST )
 +
 +#define __ssi_set_frame_length(n) \
-+    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4) 
++    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4)
 +
 +/* n = 1 - 16 */
 +#define __ssi_set_microwire_command_length(n) \
@@ -3279,11 +3279,11 @@
 +#define __ssi_transmit_data(v)  ( REG_SSI_DR = (v) )
 +
 +#endif /* __ASM_JZ4730_OPS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/regs.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/regs.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,2550 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/regs.h
++ *  linux/arch/mips/include/asm/mach-jz4730/regs.h
 + *
 + *  JZ4730 registers definition.
 + *
@@ -5016,7 +5016,7 @@
 +
 +
 +/*************************************************************************
-+ * DMAC 
++ * DMAC
 + *************************************************************************/
 +#define DMAC_DSAR(n)	(DMAC_BASE + (0x00 + (n) * 0x20))
 +#define DMAC_DDAR(n)	(DMAC_BASE + (0x04 + (n) * 0x20))
@@ -5178,7 +5178,7 @@
 +
 +
 +/*************************************************************************
-+ * AIC 
++ * AIC
 + *************************************************************************/
 +#define	AIC_FR			(AIC_BASE + 0x000)
 +#define	AIC_CR			(AIC_BASE + 0x004)
@@ -5354,7 +5354,7 @@
 +
 +
 +/*************************************************************************
-+ * LCD 
++ * LCD
 + *************************************************************************/
 +#define LCD_CFG		(LCD_BASE + 0x00)
 +#define LCD_VSYNC	(LCD_BASE + 0x04)
@@ -5755,7 +5755,7 @@
 +#define SSI_CR1_MULTS		(1 << 22)
 +#define SSI_CR1_FMAT_BIT	20
 +#define SSI_CR1_FMAT_MASK	(0x3 << SSI_CR1_FMAT_BIT)
-+  #define SSI_CR1_FMAT_SPI	  (0 << SSI_CR1_FMAT_BIT) /* Motorola°Øs SPI format */
++  #define SSI_CR1_FMAT_SPI	  (0 << SSI_CR1_FMAT_BIT) /* MotorolaÔøΩÔøΩs SPI format */
 +  #define SSI_CR1_FMAT_SSP	  (1 << SSI_CR1_FMAT_BIT) /* TI's SSP format */
 +  #define SSI_CR1_FMAT_MW1	  (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
 +  #define SSI_CR1_FMAT_MW2	  (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */
@@ -5832,11 +5832,11 @@
 +#define SSI_ITR_IVLTM_MASK	(0x7fff << SSI_ITR_IVLTM_BIT)
 +
 +#endif /* __ASM_JZ4730_REGS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/serial.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/serial.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,33 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4730/serial.h
++ *  linux/arch/mips/include/asm/mach-jz4730/serial.h
 + *
 + *  JZ4730 serial port definition.
 + *
@@ -5868,8 +5868,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_JZ4730_SERIAL_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4730/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4730/war.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/war.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/war.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -5896,11 +5896,11 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/board-dipper.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/board-dipper.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-dipper.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-dipper.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,69 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/board-dipper.h
++ *  linux/arch/mips/include/asm/mach-jz4740/board-dipper.h
 + *
 + *  JZ4725-based (16bit) Dipper board ver 1.x definition.
 + *
@@ -5916,13 +5916,13 @@
 +#ifndef __ASM_JZ4725_DIPPER_H__
 +#define __ASM_JZ4725_DIPPER_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO JZ4725
 + */
 +#define GPIO_SD_VCC_EN_N	85  /* GPC21 */
@@ -5935,7 +5935,7 @@
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -5968,8 +5968,8 @@
 +})
 +
 +#endif /* __ASM_JZ4740_DIPPER_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/board-leo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/board-leo.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-leo.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-leo.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,56 @@
 +#ifndef __ASM_JZ4740_LEO_H__
 +#define __ASM_JZ4740_LEO_H__
@@ -5978,14 +5978,14 @@
 + * Define your board specific codes here !!!
 + */
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_DISP_OFF_N		100
@@ -5993,7 +5993,7 @@
 +#define GPIO_SD_CD_N		120
 +#define GPIO_SD_WP		111
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -6027,11 +6027,11 @@
 +})
 +
 +#endif /* __ASM_JZ4740_BOARD_LEO_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/board-lyra.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/board-lyra.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-lyra.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-lyra.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,70 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/board-lyra.h
++ *  linux/arch/mips/include/asm/mach-jz4740/board-lyra.h
 + *
 + *  JZ4740-based LYRA board ver 2.x definition.
 + *
@@ -6047,14 +6047,14 @@
 +#ifndef __ASM_JZ4740_LYRA_H__
 +#define __ASM_JZ4740_LYRA_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_SD_VCC_EN_N	113 /* GPD17 */
@@ -6067,7 +6067,7 @@
 +#define GPIO_LED_EN       	124 /* GPD28 */
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -6100,11 +6100,11 @@
 +})
 +
 +#endif /* __ASM_JZ4740_LYRA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/board-pavo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/board-pavo.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-pavo.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-pavo.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,70 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/board-pavo.h
++ *  linux/arch/mips/include/asm/mach-jz4740/board-pavo.h
 + *
 + *  JZ4730-based PAVO board ver 2.x definition.
 + *
@@ -6120,14 +6120,14 @@
 +#ifndef __ASM_JZ4740_PAVO_H__
 +#define __ASM_JZ4740_PAVO_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_SD_VCC_EN_N	113 /* GPD17 */
@@ -6140,7 +6140,7 @@
 +#define GPIO_LED_EN       	124 /* GPD28 */
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -6173,11 +6173,11 @@
 +})
 +
 +#endif /* __ASM_JZ4740_PAVO_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/board-virgo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/board-virgo.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-virgo.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-virgo.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,67 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/board-virgo.h
++ *  linux/arch/mips/include/asm/mach-jz4740/board-virgo.h
 + *
 + *  JZ4720-based VIRGO board ver 1.x definition.
 + *
@@ -6193,16 +6193,16 @@
 +#ifndef __ASM_JZ4720_VIRGO_H__
 +#define __ASM_JZ4720_VIRGO_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO VIRGO(JZ4720)
 + */
-+#define GPIO_SD_VCC_EN_N	115 /* GPD19 */	
++#define GPIO_SD_VCC_EN_N	115 /* GPD19 */
 +#define GPIO_SD_CD_N		116 /* GPD20 */
 +#define GPIO_USB_DETE		114 /* GPD18 */
 +#define GPIO_DC_DETE_N		120 /* GPD24 */
@@ -6211,7 +6211,7 @@
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -6243,11 +6243,11 @@
 +})
 +
 +#endif /* __ASM_JZ4720_VIRGO_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/clock.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/clock.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,173 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/clock.h
++ *  linux/arch/mips/include/asm/mach-jz4740/clock.h
 + *
 + *  JZ4740 clocks definition.
 + *
@@ -6419,11 +6419,11 @@
 +}
 +
 +#endif /* __ASM_JZ4740_CLOCK_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/dma.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,265 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/dma.h
++ *  linux/arch/mips/include/asm/mach-jz4740/dma.h
 + *
 + *  JZ4740 DMA definition.
 + *
@@ -6481,7 +6481,7 @@
 +#define DMA_MODE_MASK	0x3
 +
 +struct jz_dma_chan {
-+	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */ 
++	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */
 +	unsigned int io;        /* DMA channel number */
 +	const char *dev_str;    /* string describes the DMA channel */
 +	int irq;                /* DMA irq number */
@@ -6687,11 +6687,11 @@
 +}
 +
 +#endif  /* __ASM_JZ4740_DMA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/jz4740.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/jz4740.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/jz4740.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/jz4740.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,56 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/jz4740.h
++ *  linux/arch/mips/include/asm/mach-jz4740/jz4740.h
 + *
 + *  JZ4740 common definition.
 + *
@@ -6746,11 +6746,11 @@
 +#include <asm/mach-jz4740/serial.h>
 +
 +#endif /* __ASM_JZ4740_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/misc.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/misc.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,43 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/misc.h
++ *  linux/arch/mips/include/asm/mach-jz4740/misc.h
 + *
 + *  Ingenic's JZ4740 common include.
 + *
@@ -6792,11 +6792,11 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4740_MISC_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/ops.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/ops.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,2224 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/ops.h
++ *  linux/arch/mips/include/asm/mach-jz4740/ops.h
 + *
 + *  Ingenic's JZ4740 common include.
 + *
@@ -6975,7 +6975,7 @@
 +//
 +//////////////////////////////////////////////////////////
 +
-+/* 
++/*
 + * p is the port number (0,1,2,3)
 + * o is the pin offset (0-31) inside the port
 + * n is the absolute number of a pin (0-127), regardless of the port
@@ -7003,7 +7003,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D31, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
++ * D0 ~ D31, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
 + * RDWE#, CKO#, WE0#, WE1#, WE2#, WE3#
 + */
 +#define __gpio_as_sdram_32bit()			\
@@ -7020,7 +7020,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
++ * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
 + * RDWE#, CKO#, WE0#, WE1#
 + */
 +#define __gpio_as_sdram_16bit()			\
@@ -8034,7 +8034,7 @@
 +	REG_AIC_ACCR1 |= AC97_PCM_XS_L_FRONT | AC97_PCM_XS_R_FRONT;	\
 +} while(0)
 +
-+/* In fact, only stereo is support now. */ 
++/* In fact, only stereo is support now. */
 +#define __ac97_set_rs_none()	( REG_AIC_ACCR1 &= ~AIC_ACCR1_RS_MASK )
 +#define __ac97_set_rs_mono() 						\
 +do {									\
@@ -8140,7 +8140,7 @@
 +#define __aic_write_tfifo(v)  ( REG_AIC_DR = (v) )
 +#define __aic_read_rfifo()    ( REG_AIC_DR )
 +
-+#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC ) 
++#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC )
 +#define __aic_external_codec()  ( REG_AIC_FR &= ~AIC_FR_ICDC )
 +
 +//
@@ -8541,7 +8541,7 @@
 +#define __ssi_set_lsb() ( REG_SSI_CR1 |= SSI_CR1_LFST )
 +
 +#define __ssi_set_frame_length(n) \
-+    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4) 
++    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4)
 +
 +/* n = 1 - 16 */
 +#define __ssi_set_microwire_command_length(n) \
@@ -8808,7 +8808,7 @@
 +#define __lcd_panel_white()		( REG_LCD_CFG |= LCD_CFG_WHITE )
 +#define __lcd_panel_black()		( REG_LCD_CFG &= ~LCD_CFG_WHITE )
 +
-+/* n=1,2,4,8 for single mono-STN 
++/* n=1,2,4,8 for single mono-STN
 + * n=4,8 for dual mono-STN
 + */
 +#define __lcd_set_panel_datawidth(n) 		\
@@ -9019,11 +9019,11 @@
 +
 +
 +#endif /* __JZ4740_OPS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/regs.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/regs.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,2392 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/regs.h
++ *  linux/arch/mips/include/asm/mach-jz4740/regs.h
 + *
 + *  Ingenic's JZ4740 common include.
 + *
@@ -9711,7 +9711,7 @@
 +#define DMAC_DCCSR_CT		(1 << 1)  /* count terminated */
 +#define DMAC_DCCSR_EN		(1 << 0)  /* channel enable bit */
 +
-+// DMA channel command register 
++// DMA channel command register
 +#define DMAC_DCMD_SAI		(1 << 23) /* source address increment */
 +#define DMAC_DCMD_DAI		(1 << 22) /* dest address increment */
 +#define DMAC_DCMD_RDIL_BIT	16        /* request detection interval length */
@@ -11414,11 +11414,11 @@
 +#define USB_CNTL_BURST_16	(3 << 9)
 +
 +#endif /* __JZ4740_REGS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/serial.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/serial.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,30 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4740/serial.h
++ *  linux/arch/mips/include/asm/mach-jz4740/serial.h
 + *
 + *  Ingenic's JZ4740 common include.
 + *
@@ -11447,8 +11447,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4740/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4740/war.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/war.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/war.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -11475,11 +11475,11 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/board-apus.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/board-apus.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/board-apus.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/board-apus.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,119 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/board-apus.h
++ *  linux/arch/mips/include/asm/mach-jz4750/board-apus.h
 + *
 + *  JZ4750-based APUS board ver 1.x definition.
 + *
@@ -11495,13 +11495,13 @@
 +#ifndef __ASM_JZ4750_APUS_H__
 +#define __ASM_JZ4750_APUS_H__
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		24000000  /* Main extal freq: 24 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_DISP_OFF_N         (32*4+25) /* GPE25 */
@@ -11518,7 +11518,7 @@
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * LCD backlight
 + */
 +#define LCD_PWM_CHN 4    /* pwm channel */
@@ -11536,7 +11536,7 @@
 +	__gpio_clear_pin(GPIO_LCD_PWM);	\
 +} while (0)
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -11597,11 +11597,11 @@
 +})
 +
 +#endif /* __ASM_JZ4750_APUS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/board-fuwa.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/board-fuwa.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/board-fuwa.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/board-fuwa.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,93 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/board-fuwa.h
++ *  linux/arch/mips/include/asm/mach-jz4750/board-fuwa.h
 + *
 + *  JZ4750-based FUWA board ver 1.x definition.
 + *
@@ -11619,14 +11619,14 @@
 +
 +#define CONFIG_FPGA	 /* fuwa is an FPGA board */
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		48000000  /* Main extal freq: 12 MHz */
 +#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_SD_VCC_EN_N	113 /* GPD17 */
@@ -11640,7 +11640,7 @@
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
 +
-+/*====================================================================== 
++/*======================================================================
 + * LCD backlight
 + */
 +#define GPIO_LCD_PWM   		(32*4+20) /* GPE20 */
@@ -11660,7 +11660,7 @@
 +	__gpio_clear_pin(GPIO_LCD_PWM);	\
 +} while (0)
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -11693,11 +11693,11 @@
 +})
 +
 +#endif /* __ASM_JZ4750_FUWA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/clock.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/clock.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,204 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/clock.h
++ *  linux/arch/mips/include/asm/mach-jz4750/clock.h
 + *
 + *  JZ4750 clocks definition.
 + *
@@ -11831,9 +11831,9 @@
 +	}
 +}
 +
-+/* 
++/*
 + * MSC clock
-+ * @n: the index of MMC/SD controller 
++ * @n: the index of MMC/SD controller
 + */
 +static __inline__ unsigned int __cpm_get_mscclk(int n)
 +{
@@ -11900,11 +11900,11 @@
 +}
 +
 +#endif /* __ASM_JZ4750_CLOCK_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/dma.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,307 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/dma.h
++ *  linux/arch/mips/include/asm/mach-jz4750/dma.h
 + *
 + *  JZ4750 DMA definition.
 + *
@@ -11992,7 +11992,7 @@
 +#define DMA_MODE_MASK	0x3
 +
 +struct jz_dma_chan {
-+	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */ 
++	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */
 +	unsigned int io;        /* DMA channel number */
 +	const char *dev_str;    /* string describes the DMA channel */
 +	int irq;                /* DMA irq number */
@@ -12210,11 +12210,11 @@
 +}
 +
 +#endif  /* __ASM_JZ4750_DMA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/jz4750.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/jz4750.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/jz4750.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/jz4750.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,44 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/jz4750.h
++ *  linux/arch/mips/include/asm/mach-jz4750/jz4750.h
 + *
 + *  JZ4750 common definition.
 + *
@@ -12257,11 +12257,11 @@
 +#include <asm/mach-jz4750/serial.h>
 +
 +#endif /* __ASM_JZ4750_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/misc.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/misc.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,44 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/misc.h
++ *  linux/arch/mips/include/asm/mach-jz4750/misc.h
 + *
 + *  Ingenic's JZ4750 common include.
 + *
@@ -12304,11 +12304,11 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4750_MISC_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/ops.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/ops.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,3569 @@
 +/*
-+ * linux/include/asm-mips/mach-jz4750/ops.h
++ * linux/arch/mips/include/asm/mach-jz4750/ops.h
 + *
 + * JZ4750 register definition.
 + *
@@ -12579,7 +12579,7 @@
 +//
 +//////////////////////////////////////////////////////////
 +
-+/* 
++/*
 + * p is the port number (0,1,2,3,4,5)
 + * o is the pin offset (0-31) inside the port
 + * n is the absolute number of a pin (0-191), regardless of the port
@@ -12607,7 +12607,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#, 
++ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#,
 + * RDWE#, WE0#, WE1#, WE2#, WE3#, CKO#, CKE#
 + */
 +#define __gpio_as_sdram_32bit()			\
@@ -12621,7 +12621,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D15, A0 ~ A14, DCS0#, RAS#, CAS#, 
++ * D0 ~ D15, A0 ~ A14, DCS0#, RAS#, CAS#,
 + * RDWE#, WE0#, WE1#, WE2#, WE3#, CKO#, CKE#
 + */
 +#define __gpio_as_sdram_16bit()						\
@@ -12950,7 +12950,7 @@
 +	REG_GPIO_PXPES(4)  = 0x00000fff;	\
 +} while (0)
 +
-+/* 
++/*
 + * SDATO, SDATI, BCLK, SYNC, SCLK_RSTN(gpio sepc) or
 + * SDATA_OUT, SDATA_IN, BIT_CLK, SYNC, SCLK_RESET(aic spec)
 + */
@@ -13941,7 +13941,7 @@
 +	REG_AIC_ACCR1 |= AC97_PCM_XS_L_FRONT | AC97_PCM_XS_R_FRONT;	\
 +} while(0)
 +
-+/* In fact, only stereo is support now. */ 
++/* In fact, only stereo is support now. */
 +#define __ac97_set_rs_none()	( REG_AIC_ACCR1 &= ~AIC_ACCR1_RS_MASK )
 +#define __ac97_set_rs_mono() 						\
 +do {									\
@@ -14047,7 +14047,7 @@
 +#define __aic_write_tfifo(v)  ( REG_AIC_DR = (v) )
 +#define __aic_read_rfifo()    ( REG_AIC_DR )
 +
-+#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC ) 
++#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC )
 +#define __aic_external_codec()  ( REG_AIC_FR &= ~AIC_FR_ICDC )
 +
 +//
@@ -14227,7 +14227,7 @@
 +
 +/* sysclk(cpm_pcm_sysclk) Hz is created by cpm logic, and pcmclk Hz is the pcm in/out clock wanted */
 +#define __pcm_set_clk_rate(sysclk, pcmclk) \
-+__pcm_set_clk_div(((sysclk) / (pcmclk) - 1)) 
++__pcm_set_clk_div(((sysclk) / (pcmclk) - 1))
 +
 +#define __pcm_set_sync_div(n) \
 +( REG_PCM_DIV = (REG_PCM_DIV & ~PCM_DIV_SYNDIV_MASK) | ((n) << PCM_DIV_SYNDIV_BIT) )
@@ -14568,7 +14568,7 @@
 +/* frmhl,endian,mcom,flen,pha,pol MASK */
 +#define SSICR1_MISC_MASK 					\
 +	( SSI_CR1_FRMHL_MASK | SSI_CR1_LFST | SSI_CR1_MCOM_MASK	\
-+	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )	
++	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )
 +
 +#define __ssi_spi_set_misc(n,frmhl,endian,flen,mcom,pha,pol)		\
 +	do {								\
@@ -14583,7 +14583,7 @@
 +#define __ssi_set_lsb(n) ( REG_SSI_CR1(n) |= SSI_CR1_LFST )
 +
 +#define __ssi_set_frame_length(n, m)					\
-+	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4) 
++	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4)
 +
 +/* m = 1 - 16 */
 +#define __ssi_set_microwire_command_length(n,m)				\
@@ -14947,8 +14947,8 @@
 +
 +#define __lcd_set_24_tftpnl()		( REG_LCD_CFG |= LCD_CFG_MODE_TFT_24BIT )
 +
-+/* 
-+ * n=1,2,4,8 for single mono-STN 
++/*
++ * n=1,2,4,8 for single mono-STN
 + * n=4,8 for dual mono-STN
 + */
 +#define __lcd_set_panel_datawidth(n) 		\
@@ -15559,7 +15559,7 @@
 +#define __owi_disable_byte_interrupt()     ( REG_OWI_CTL &= ~OWI_CTL_EBYTE )
 +#define __owi_enable_bit_interrupt()       ( REG_OWI_CTL |= OWI_CTL_EBIT )
 +#define __owi_disable_bit_interrupt()      ( REG_OWI_CTL &= ~OWI_CTL_EBIT )
-+#define __owi_enable_rst_interrupt()       ( REG_OWI_CTL |= OWI_CTL_ERST ) 
++#define __owi_enable_rst_interrupt()       ( REG_OWI_CTL |= OWI_CTL_ERST )
 +#define __owi_disable_rst_interrupt()      ( REG_OWI_CTL &=~OWI_CTL_ERST )
 +
 +/* OW configure register ops */
@@ -15657,7 +15657,7 @@
 +#define __tssi_disable_ovrn_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_OVRNM )
 +
 +#define __tssi_enable_trig_irq()              ( REG_TSSI_CTRL &= ~TSSI_CTRL_TRIGM )
-+#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM ) 
++#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM )
 +
 +#define __tssi_state_is_overrun()             ( REG_TSSI_STAT & TSSI_STAT_OVRN )
 +#define __tssi_state_trigger_meet()           ( REG_TSSI_STAT & TSSI_STAT_TRIG )
@@ -15876,11 +15876,11 @@
 +
 +
 +#endif /* __JZ4750_OPS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/regs.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/regs.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,3411 @@
 +/*
-+ * linux/include/asm-mips/mach-jz4750/regs.h
++ * linux/arch/mips/include/asm/mach-jz4750/regs.h
 + *
 + * JZ4750 register definition.
 + *
@@ -16633,7 +16633,7 @@
 +#define DMAC_DCCSR_CT		(1 << 1)  /* count terminated */
 +#define DMAC_DCCSR_EN		(1 << 0)  /* channel enable bit */
 +
-+// DMA channel command register 
++// DMA channel command register
 +#define DMAC_DCMD_EACKS_LOW  	(1 << 31) /* External DACK Output Level Select, active low */
 +#define DMAC_DCMD_EACKS_HIGH  	(0 << 31) /* External DACK Output Level Select, active high */
 +#define DMAC_DCMD_EACKM_WRITE 	(1 << 30) /* External DACK Output Mode Select, output in write cycle */
@@ -17191,7 +17191,7 @@
 +#define	REG_ICDC_RGDATA		REG32(ICDC_RGDATA)
 +
 +/* ICDC Clock Configure Register */
-+#define	ICDC_CKCFG_CKRDY	(1 << 1) 
++#define	ICDC_CKCFG_CKRDY	(1 << 1)
 +#define	ICDC_CKCFG_SELAD	(1 << 0)
 +
 +/* ICDC internal register access control Register */
@@ -17392,7 +17392,7 @@
 +  #define SSI_CR1_FMAT_MW1	  (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
 +  #define SSI_CR1_FMAT_MW2	  (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */
 +#define SSI_CR1_TTRG_BIT	16 /* SSI1 TX trigger */
-+#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT) 
++#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT)
 +#define SSI_CR1_MCOM_BIT	12
 +#define SSI_CR1_MCOM_MASK	(0xf << SSI_CR1_MCOM_BIT)
 +  #define SSI_CR1_MCOM_1BIT	  (0x0 << SSI_CR1_MCOM_BIT) /* 1-bit command selected */
@@ -18487,8 +18487,8 @@
 +/* TV Encoder Control register */
 +#define TVE_CTRL_ECVBS          (1 << 24)    /* cvbs_enable */
 +#define TVE_CTRL_DAPD3	        (1 << 23)    /* DAC 3 power down, not exist in jz4750 */
-+#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */	
-+#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */	
++#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */
++#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */
 +#define TVE_CTRL_DAPD           (1 << 20)    /* power down all DACs */
 +#define TVE_CTRL_YCDLY_BIT      16
 +#define TVE_CTRL_YCDLY_MASK     (0x7 << TVE_CTRL_YCDLY_BIT)
@@ -19067,7 +19067,7 @@
 +#define TSSI_PID6      ( TSSI_BASE + 0x38 )
 +#define TSSI_PID7      ( TSSI_BASE + 0x3c )
 +#define TSSI_PID_MAX   8	/* max PID: 7 */
-+ 
++
 +#define REG_TSSI_ENA       REG8( TSSI_ENA )
 +#define REG_TSSI_CFG       REG16( TSSI_CFG )
 +#define REG_TSSI_CTRL      REG8( TSSI_CTRL )
@@ -19121,21 +19121,21 @@
 +
 +/* TSSI PID enable register */
 +#define TSSI_PEN_EN00 	( 1 << 0 )      /* enable PID n */
-+#define TSSI_PEN_EN10 	( 1 << 1 )      
-+#define TSSI_PEN_EN20 	( 1 << 2 )      
-+#define TSSI_PEN_EN30 	( 1 << 3 )      
-+#define TSSI_PEN_EN40 	( 1 << 4 )      
-+#define TSSI_PEN_EN50 	( 1 << 5 )      
-+#define TSSI_PEN_EN60 	( 1 << 6 )      
-+#define TSSI_PEN_EN70 	( 1 << 7 )      
-+#define TSSI_PEN_EN01 	( 1 << 16 )      
-+#define TSSI_PEN_EN11 	( 1 << 17 )      
-+#define TSSI_PEN_EN21 	( 1 << 18 )     
-+#define TSSI_PEN_EN31 	( 1 << 19 )      
-+#define TSSI_PEN_EN41 	( 1 << 20 )     
-+#define TSSI_PEN_EN51 	( 1 << 21 )      
-+#define TSSI_PEN_EN61 	( 1 << 22 )     
-+#define TSSI_PEN_EN71 	( 1 << 23 )      
++#define TSSI_PEN_EN10 	( 1 << 1 )
++#define TSSI_PEN_EN20 	( 1 << 2 )
++#define TSSI_PEN_EN30 	( 1 << 3 )
++#define TSSI_PEN_EN40 	( 1 << 4 )
++#define TSSI_PEN_EN50 	( 1 << 5 )
++#define TSSI_PEN_EN60 	( 1 << 6 )
++#define TSSI_PEN_EN70 	( 1 << 7 )
++#define TSSI_PEN_EN01 	( 1 << 16 )
++#define TSSI_PEN_EN11 	( 1 << 17 )
++#define TSSI_PEN_EN21 	( 1 << 18 )
++#define TSSI_PEN_EN31 	( 1 << 19 )
++#define TSSI_PEN_EN41 	( 1 << 20 )
++#define TSSI_PEN_EN51 	( 1 << 21 )
++#define TSSI_PEN_EN61 	( 1 << 22 )
++#define TSSI_PEN_EN71 	( 1 << 23 )
 +#define TSSI_PEN_PID0 	( 1 << 31 ) /* PID filter enable PID0 */
 +
 +/* TSSI PID Filter Registers */
@@ -19290,11 +19290,11 @@
 +
 +
 +#endif /* __JZ4750_REGS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/serial.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/serial.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,30 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750/serial.h
++ *  linux/arch/mips/include/asm/mach-jz4750/serial.h
 + *
 + *  Ingenic's JZ4750 common include.
 + *
@@ -19323,8 +19323,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750/war.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/war.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/war.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19351,11 +19351,11 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/board-fuwa1.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/board-fuwa1.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,124 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/board-fuwa1.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h
 + *
 + *  JZ4750D-based FUWA1 board ver 1.x definition.
 + *
@@ -19373,7 +19373,7 @@
 +
 +#define CONFIG_FPGA	 /* fuwa is an FPGA board */
 +
-+/*====================================================================== 
++/*======================================================================
 + * Frequencies of on-board oscillators
 + */
 +#define JZ_EXTAL		48000000  /* Main extal freq: 12 MHz */
@@ -19381,7 +19381,7 @@
 +#define CFG_DIV                 1         /* hclk=pclk=mclk=CFG_EXTAL/CFG_DIV, just for FPGA board */
 +
 +
-+/*====================================================================== 
++/*======================================================================
 + * GPIO
 + */
 +#define GPIO_SD0_VCC_EN_N	(32*2+10) /* GPC10 */
@@ -19397,7 +19397,7 @@
 +
 +#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
 +
-+/*====================================================================== 
++/*======================================================================
 + * LCD backlight
 + */
 +#define GPIO_LCD_PWM   		(32*4+20) /* GPE20 */
@@ -19417,7 +19417,7 @@
 +	__gpio_clear_pin(GPIO_LCD_PWM);	\
 +} while (0)
 +
-+/*====================================================================== 
++/*======================================================================
 + * MMC/SD
 + */
 +
@@ -19478,11 +19478,11 @@
 +})
 +
 +#endif /* __ASM_JZ4750d_FUWA1_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/clock.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/clock.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,230 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/clock.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/clock.h
 + *
 + *  JZ4750D clocks definition.
 + *
@@ -19641,9 +19641,9 @@
 +	}
 +}
 +
-+/* 
++/*
 + * MSC clock
-+ * @n: the index of MMC/SD controller 
++ * @n: the index of MMC/SD controller
 + */
 +static __inline__ unsigned int __cpm_get_mscclk(int n)
 +{
@@ -19711,11 +19711,11 @@
 +}
 +
 +#endif /* __ASM_JZ4750D_CLOCK_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/dma.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,307 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/dma.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/dma.h
 + *
 + *  JZ4750D DMA definition.
 + *
@@ -19803,7 +19803,7 @@
 +#define DMA_MODE_MASK	0x3
 +
 +struct jz_dma_chan {
-+	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */ 
++	int dev_id;	/* DMA ID: this channel is allocated if >=0, free otherwise */
 +	unsigned int io;        /* DMA channel number */
 +	const char *dev_str;    /* string describes the DMA channel */
 +	int irq;                /* DMA irq number */
@@ -20021,11 +20021,11 @@
 +}
 +
 +#endif  /* __ASM_JZ4750D_DMA_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/jz4750d.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/jz4750d.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/jz4750d.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/jz4750d.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,40 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/jz4750d.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/jz4750d.h
 + *
 + *  JZ4750 common definition.
 + *
@@ -20064,11 +20064,11 @@
 +#include <asm/mach-jz4750d/serial.h>
 +
 +#endif /* __ASM_JZ4750_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/misc.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/misc.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,44 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/misc.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/misc.h
 + *
 + *  Ingenic's JZ4750D common include.
 + *
@@ -20111,11 +20111,11 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4750D_MISC_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/ops.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/ops.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,3450 @@
 +/*
-+ * linux/include/asm-mips/mach-jz4750d/ops.h
++ * linux/arch/mips/include/asm/mach-jz4750d/ops.h
 + *
 + * JZ4750D register definition.
 + *
@@ -20246,7 +20246,7 @@
 +//	18		A18             DREQ            -
 +//	19		A19             DACK            -
 +//	20		WAIT#		-		-             Note2
-+//	21		CS1#		-               - 
++//	21		CS1#		-               -
 +//	22		CS2#		-               -
 +//	23		CS3#		-               -
 +//	24		CS4#		-               -
@@ -20392,7 +20392,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#, 
++ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#,
 + * RDWE#, WE0#, WE1#, WE2#, WE3#, CKO#, CKE#
 + */
 +#define __gpio_as_sdram_32bit()			\
@@ -20407,7 +20407,7 @@
 +
 +
 +/*
-+ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#, 
++ * D0 ~ D31, A0 ~ A14, DCS0#, RAS#, CAS#,
 + * RDWE#, WE0#, WE1#, WE2#, WE3#, CKO#, CKE#
 + * !!!!DCS1#
 + */
@@ -20425,7 +20425,7 @@
 +} while (0)
 +
 +/*
-+ * D0 ~ D15, A0 ~ A14, DCS0#, RAS#, CAS#, 
++ * D0 ~ D15, A0 ~ A14, DCS0#, RAS#, CAS#,
 + * RDWE#, WE0#, WE1#, WE2#, WE3#, CKO#, CKE#
 + */
 +#define __gpio_as_sdram_16bit()						\
@@ -20655,7 +20655,7 @@
 +	REG_GPIO_PXPES(4)  = 0x00000fff;	\
 +} while (0)
 +
-+/* 
++/*
 + * SDATO, SDATI, BCLK, SYNC, SCLK_RSTN(gpio sepc) or
 + * SDATA_OUT, SDATA_IN, BIT_CLK, SYNC, SCLK_RESET(aic spec)
 + */
@@ -21624,7 +21624,7 @@
 +	REG_AIC_ACCR1 |= AC97_PCM_XS_L_FRONT | AC97_PCM_XS_R_FRONT;	\
 +} while(0)
 +
-+/* In fact, only stereo is support now. */ 
++/* In fact, only stereo is support now. */
 +#define __ac97_set_rs_none()	( REG_AIC_ACCR1 &= ~AIC_ACCR1_RS_MASK )
 +#define __ac97_set_rs_mono() 						\
 +do {									\
@@ -21730,7 +21730,7 @@
 +#define __aic_write_tfifo(v)  ( REG_AIC_DR = (v) )
 +#define __aic_read_rfifo()    ( REG_AIC_DR )
 +
-+#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC ) 
++#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC )
 +#define __aic_external_codec()  ( REG_AIC_FR &= ~AIC_FR_ICDC )
 +
 +//
@@ -21910,7 +21910,7 @@
 +
 +/* sysclk(cpm_pcm_sysclk) Hz is created by cpm logic, and pcmclk Hz is the pcm in/out clock wanted */
 +#define __pcm_set_clk_rate(sysclk, pcmclk) \
-+__pcm_set_clk_div(((sysclk) / (pcmclk) - 1)) 
++__pcm_set_clk_div(((sysclk) / (pcmclk) - 1))
 +
 +#define __pcm_set_sync_div(n) \
 +( REG_PCM_DIV = (REG_PCM_DIV & ~PCM_DIV_SYNDIV_MASK) | ((n) << PCM_DIV_SYNDIV_BIT) )
@@ -22251,7 +22251,7 @@
 +/* frmhl,endian,mcom,flen,pha,pol MASK */
 +#define SSICR1_MISC_MASK 					\
 +	( SSI_CR1_FRMHL_MASK | SSI_CR1_LFST | SSI_CR1_MCOM_MASK	\
-+	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )	
++	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )
 +
 +#define __ssi_spi_set_misc(n,frmhl,endian,flen,mcom,pha,pol)		\
 +	do {								\
@@ -22266,7 +22266,7 @@
 +#define __ssi_set_lsb(n) ( REG_SSI_CR1(n) |= SSI_CR1_LFST )
 +
 +#define __ssi_set_frame_length(n, m)					\
-+	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4) 
++	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4)
 +
 +/* m = 1 - 16 */
 +#define __ssi_set_microwire_command_length(n,m)				\
@@ -22635,8 +22635,8 @@
 +
 +#define __lcd_set_24_tftpnl()		( REG_LCD_CFG |= LCD_CFG_MODE_TFT_24BIT )
 +
-+/* 
-+ * n=1,2,4,8 for single mono-STN 
++/*
++ * n=1,2,4,8 for single mono-STN
 + * n=4,8 for dual mono-STN
 + */
 +#define __lcd_set_panel_datawidth(n) 		\
@@ -23247,7 +23247,7 @@
 +#define __owi_disable_byte_interrupt()     ( REG_OWI_CTL &= ~OWI_CTL_EBYTE )
 +#define __owi_enable_bit_interrupt()       ( REG_OWI_CTL |= OWI_CTL_EBIT )
 +#define __owi_disable_bit_interrupt()      ( REG_OWI_CTL &= ~OWI_CTL_EBIT )
-+#define __owi_enable_rst_interrupt()       ( REG_OWI_CTL |= OWI_CTL_ERST ) 
++#define __owi_enable_rst_interrupt()       ( REG_OWI_CTL |= OWI_CTL_ERST )
 +#define __owi_disable_rst_interrupt()      ( REG_OWI_CTL &=~OWI_CTL_ERST )
 +
 +/* OW configure register ops */
@@ -23345,7 +23345,7 @@
 +#define __tssi_disable_ovrn_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_OVRNM )
 +
 +#define __tssi_enable_trig_irq()              ( REG_TSSI_CTRL &= ~TSSI_CTRL_TRIGM )
-+#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM ) 
++#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM )
 +
 +#define __tssi_state_is_overrun()             ( REG_TSSI_STAT & TSSI_STAT_OVRN )
 +#define __tssi_state_trigger_meet()           ( REG_TSSI_STAT & TSSI_STAT_TRIG )
@@ -23564,11 +23564,11 @@
 +
 +
 +#endif /* __JZ4750D_OPS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/regs.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/regs.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,3398 @@
 +/*
-+ * linux/include/asm-mips/mach-jz4750d/regs.h
++ * linux/arch/mips/include/asm/mach-jz4750d/regs.h
 + *
 + * JZ4750D register definition.
 + *
@@ -24321,7 +24321,7 @@
 +#define DMAC_DCCSR_CT		(1 << 1)  /* count terminated */
 +#define DMAC_DCCSR_EN		(1 << 0)  /* channel enable bit */
 +
-+// DMA channel command register 
++// DMA channel command register
 +#define DMAC_DCMD_EACKS_LOW  	(1 << 31) /* External DACK Output Level Select, active low */
 +#define DMAC_DCMD_EACKS_HIGH  	(0 << 31) /* External DACK Output Level Select, active high */
 +#define DMAC_DCMD_EACKM_WRITE 	(1 << 30) /* External DACK Output Mode Select, output in write cycle */
@@ -24879,7 +24879,7 @@
 +#define	REG_ICDC_RGDATA		REG32(ICDC_RGDATA)
 +
 +/* ICDC Clock Configure Register */
-+#define	ICDC_CKCFG_CKRDY	(1 << 1) 
++#define	ICDC_CKCFG_CKRDY	(1 << 1)
 +#define	ICDC_CKCFG_SELAD	(1 << 0)
 +
 +/* ICDC internal register access control Register */
@@ -25080,7 +25080,7 @@
 +  #define SSI_CR1_FMAT_MW1	  (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
 +  #define SSI_CR1_FMAT_MW2	  (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */
 +#define SSI_CR1_TTRG_BIT	16 /* SSI1 TX trigger */
-+#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT) 
++#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT)
 +#define SSI_CR1_MCOM_BIT	12
 +#define SSI_CR1_MCOM_MASK	(0xf << SSI_CR1_MCOM_BIT)
 +  #define SSI_CR1_MCOM_1BIT	  (0x0 << SSI_CR1_MCOM_BIT) /* 1-bit command selected */
@@ -26162,8 +26162,8 @@
 +/* TV Encoder Control register */
 +#define TVE_CTRL_ECVBS          (1 << 24)    /* cvbs_enable */
 +#define TVE_CTRL_DAPD3	        (1 << 23)    /* DAC 3 power down, not exist in jz4750D */
-+#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */	
-+#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */	
++#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */
++#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */
 +#define TVE_CTRL_DAPD           (1 << 20)    /* power down all DACs */
 +#define TVE_CTRL_YCDLY_BIT      16
 +#define TVE_CTRL_YCDLY_MASK     (0x7 << TVE_CTRL_YCDLY_BIT)
@@ -26742,7 +26742,7 @@
 +#define TSSI_PID6      ( TSSI_BASE + 0x38 )
 +#define TSSI_PID7      ( TSSI_BASE + 0x3c )
 +#define TSSI_PID_MAX   8	/* max PID: 7 */
-+ 
++
 +#define REG_TSSI_ENA       REG8( TSSI_ENA )
 +#define REG_TSSI_CFG       REG16( TSSI_CFG )
 +#define REG_TSSI_CTRL      REG8( TSSI_CTRL )
@@ -26796,21 +26796,21 @@
 +
 +/* TSSI PID enable register */
 +#define TSSI_PEN_EN00 	( 1 << 0 )      /* enable PID n */
-+#define TSSI_PEN_EN10 	( 1 << 1 )      
-+#define TSSI_PEN_EN20 	( 1 << 2 )      
-+#define TSSI_PEN_EN30 	( 1 << 3 )      
-+#define TSSI_PEN_EN40 	( 1 << 4 )      
-+#define TSSI_PEN_EN50 	( 1 << 5 )      
-+#define TSSI_PEN_EN60 	( 1 << 6 )      
-+#define TSSI_PEN_EN70 	( 1 << 7 )      
-+#define TSSI_PEN_EN01 	( 1 << 16 )      
-+#define TSSI_PEN_EN11 	( 1 << 17 )      
-+#define TSSI_PEN_EN21 	( 1 << 18 )     
-+#define TSSI_PEN_EN31 	( 1 << 19 )      
-+#define TSSI_PEN_EN41 	( 1 << 20 )     
-+#define TSSI_PEN_EN51 	( 1 << 21 )      
-+#define TSSI_PEN_EN61 	( 1 << 22 )     
-+#define TSSI_PEN_EN71 	( 1 << 23 )      
++#define TSSI_PEN_EN10 	( 1 << 1 )
++#define TSSI_PEN_EN20 	( 1 << 2 )
++#define TSSI_PEN_EN30 	( 1 << 3 )
++#define TSSI_PEN_EN40 	( 1 << 4 )
++#define TSSI_PEN_EN50 	( 1 << 5 )
++#define TSSI_PEN_EN60 	( 1 << 6 )
++#define TSSI_PEN_EN70 	( 1 << 7 )
++#define TSSI_PEN_EN01 	( 1 << 16 )
++#define TSSI_PEN_EN11 	( 1 << 17 )
++#define TSSI_PEN_EN21 	( 1 << 18 )
++#define TSSI_PEN_EN31 	( 1 << 19 )
++#define TSSI_PEN_EN41 	( 1 << 20 )
++#define TSSI_PEN_EN51 	( 1 << 21 )
++#define TSSI_PEN_EN61 	( 1 << 22 )
++#define TSSI_PEN_EN71 	( 1 << 23 )
 +#define TSSI_PEN_PID0 	( 1 << 31 ) /* PID filter enable PID0 */
 +
 +/* TSSI PID Filter Registers */
@@ -26965,11 +26965,11 @@
 +
 +
 +#endif /* __JZ4750D_REGS_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/serial.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/serial.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,30 @@
 +/*
-+ *  linux/include/asm-mips/mach-jz4750d/serial.h
++ *  linux/arch/mips/include/asm/mach-jz4750d/serial.h
 + *
 + *  Ingenic's JZ4750D common include.
 + *
@@ -26998,8 +26998,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/include/asm-mips/mach-jz4750d/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/mach-jz4750d/war.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/war.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/war.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -27026,23 +27026,23 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/include/asm-mips/ptrace.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/asm-mips/ptrace.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/ptrace.h	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/arch/mips/include/asm/ptrace.h	2009-04-12 18:13:57.000000000 +0200
 @@ -79,7 +79,7 @@
  /*
   * Does the process account for user or for system time?
   */
 -#define user_mode(regs) (((regs)->cp0_status & KU_MASK) == KU_USER)
 +#define user_mode(regs) ((((regs)->cp0_status & KU_MASK) == KU_USER) || (((regs)->cp0_status & 0x08000000) == 0x08000000))
- 
+
  #define instruction_pointer(regs) ((regs)->cp0_epc)
  #define profile_pc(regs) instruction_pointer(regs)
---- linux-2.6.24.7.old/include/asm-mips/r4kcache.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/asm-mips/r4kcache.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/r4kcache.h	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/arch/mips/include/asm/r4kcache.h	2009-04-12 18:13:57.000000000 +0200
 @@ -17,6 +17,58 @@
  #include <asm/cpu-features.h>
  #include <asm/mipsmtregs.h>
- 
+
 +#ifdef CONFIG_JZRISC
 +
 +#define K0_TO_K1()				\
@@ -27105,7 +27105,7 @@
 +	INVALIDATE_BTB();
  	__iflush_epilogue
  }
- 
+
 @@ -151,6 +204,7 @@
  {
  	__dflush_prologue
@@ -27113,7 +27113,7 @@
 +	SYNC_WB();
  	__dflush_epilogue
  }
- 
+
 @@ -163,6 +217,7 @@
  {
  	__iflush_prologue
@@ -27121,7 +27121,7 @@
 +	INVALIDATE_BTB();
  	__iflush_epilogue
  }
- 
+
 @@ -170,6 +225,7 @@
  {
  	__dflush_prologue
@@ -27129,7 +27129,7 @@
 +	SYNC_WB();
  	__dflush_epilogue
  }
- 
+
 @@ -177,6 +233,7 @@
  {
  	__dflush_prologue
@@ -27137,14 +27137,14 @@
 +	SYNC_WB();
  	__dflush_epilogue
  }
- 
+
 @@ -209,6 +266,7 @@
  static inline void protected_flush_icache_line(unsigned long addr)
  {
  	protected_cache_op(Hit_Invalidate_I, addr);
 +	INVALIDATE_BTB();
  }
- 
+
  /*
 @@ -220,6 +278,7 @@
  static inline void protected_writeback_dcache_line(unsigned long addr)
@@ -27152,9 +27152,9 @@
  	protected_cache_op(Hit_Writeback_Inv_D, addr);
 +	SYNC_WB();
  }
- 
+
  static inline void protected_writeback_scache_line(unsigned long addr)
-@@ -396,13 +455,123 @@
+@@ -396,8 +396,10 @@
  __BUILD_BLAST_CACHE(d, dcache, Index_Writeback_Inv_D, Hit_Writeback_Inv_D, 16)
  __BUILD_BLAST_CACHE(i, icache, Index_Invalidate_I, Hit_Invalidate_I, 16)
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 16)
@@ -27165,8 +27165,10 @@
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 32)
  __BUILD_BLAST_CACHE(i, icache, Index_Invalidate_I, Hit_Invalidate_I, 64)
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 64)
- __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 128)
- 
+@@ -410,6 +410,114 @@
+ __BUILD_BLAST_CACHE(inv_s, scache, Index_Writeback_Inv_SD, Hit_Invalidate_SD, 64)
+ __BUILD_BLAST_CACHE(inv_s, scache, Index_Writeback_Inv_SD, Hit_Invalidate_SD, 128)
+
 +#ifdef CONFIG_JZRISC
 +
 +static inline void blast_dcache32(void)
@@ -27281,7 +27283,7 @@
 @@ -424,13 +593,73 @@
  	__##pfx##flush_epilogue						\
  }
- 
+
 +#ifndef CONFIG_JZRISC
  __BUILD_BLAST_CACHE_RANGE(d, dcache, Hit_Writeback_Inv_D, protected_)
 +#endif
@@ -27294,7 +27296,7 @@
  /* blast_inv_dcache_range */
  __BUILD_BLAST_CACHE_RANGE(inv_d, dcache, Hit_Invalidate_D, )
  __BUILD_BLAST_CACHE_RANGE(inv_s, scache, Hit_Invalidate_SD, )
- 
+
 +#ifdef CONFIG_JZRISC
 +
 +static inline void protected_blast_dcache_range(unsigned long start,
@@ -27352,8 +27354,8 @@
 +#endif /* CONFIG_JZRISC */
 +
  #endif /* _ASM_R4KCACHE_H */
---- linux-2.6.24.7.old/include/asm-mips/sizes.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/asm-mips/sizes.h	2009-04-12 18:13:57.000000000 +0200
+--- linux-2.6.24.7.old/arch/mips/include/asm/sizes.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.6.24.7/arch/mips/include/asm/sizes.h	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,56 @@
 +/*
 + * This program is free software; you can redistribute it and/or modify
@@ -27411,45 +27413,34 @@
 +#endif
 +
 +/*         END */
---- linux-2.6.24.7.old/include/linux/fs.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/fs.h	2009-04-12 18:13:57.000000000 +0200
-@@ -1670,6 +1670,8 @@
- extern int invalidate_inode_pages2(struct address_space *mapping);
- extern int invalidate_inode_pages2_range(struct address_space *mapping,
- 					 pgoff_t start, pgoff_t end);
-+extern void generic_sync_sb_inodes(struct super_block *sb,
-+				struct writeback_control *wbc);
- extern int write_inode_now(struct inode *, int);
- extern int filemap_fdatawrite(struct address_space *);
- extern int filemap_flush(struct address_space *);
 --- linux-2.6.24.7.old/include/linux/i2c-dev.h	2008-05-07 01:22:34.000000000 +0200
 +++ linux-2.6.24.7/include/linux/i2c-dev.h	2009-04-12 18:13:57.000000000 +0200
 @@ -49,7 +49,8 @@
- 
+
  #define I2C_PEC		0x0708	/* != 0 to use PEC with SMBus */
  #define I2C_SMBUS	0x0720	/* SMBus transfer */
 -
 +#define I2C_SET_SUB_ADDRESS	0x0730	/* SMBus transfer */
 +#define I2C_SET_CLOCK	0x0731	/* SMBus transfer */
- 
+
  /* This is the structure as used in the I2C_SMBUS ioctl call */
  struct i2c_smbus_ioctl_data {
 @@ -71,4 +72,5 @@
  #define I2C_MAJOR	89		/* Device major number		*/
  #endif
- 
+
 +extern void i2c_jz_setclk(unsigned int i2cclk);
  #endif /* _LINUX_I2C_DEV_H */
 --- linux-2.6.24.7.old/include/linux/mmc/host.h	2008-05-07 01:22:34.000000000 +0200
 +++ linux-2.6.24.7/include/linux/mmc/host.h	2009-04-12 18:13:57.000000000 +0200
 @@ -41,6 +41,7 @@
- 
+
  #define MMC_BUS_WIDTH_1		0
  #define MMC_BUS_WIDTH_4		2
 +#define MMC_BUS_WIDTH_8		4
- 
+
  	unsigned char	timing;			/* timing specification used */
- 
+
 --- linux-2.6.24.7.old/include/linux/mtd/mtd.h	2009-04-12 18:05:07.000000000 +0200
 +++ linux-2.6.24.7/include/linux/mtd/mtd.h	2009-04-12 18:13:57.000000000 +0200
 @@ -32,9 +32,9 @@
@@ -27467,7 +27458,7 @@
  	u_int dev;
 @@ -46,7 +46,7 @@
  };
- 
+
  struct mtd_erase_region_info {
 -	u_int32_t offset;			/* At which this region starts, from the beginning of the MTD */
 +	u_int64_t offset;			/* At which this region starts, from the beginning of the MTD */
@@ -27495,34 +27486,42 @@
  	u_int32_t flags;
 -	u_int32_t size;	 // Total size of the MTD
 +	u_int64_t size;	 // Total size of the MTD
- 
+
  	/* "Major" erase size for the device. Na√Øve users may take this
  	 * to be the only erase size available, or may use the more detailed
-@@ -144,18 +144,18 @@
- 	int (*erase) (struct mtd_info *mtd, struct erase_info *instr);
- 
- 	/* This stuff for eXecute-In-Place */
--	int (*point) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char **mtdbuf);
-+	int (*point) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len, size_mtd_t *retlen, u_char **mtdbuf);
- 
- 	/* We probably shouldn't allow XIP if the unpoint isn't a NULL */
--	void (*unpoint) (struct mtd_info *mtd, u_char * addr, loff_t from, size_t len);
-+	void (*unpoint) (struct mtd_info *mtd, u_char * addr, loff_mtd_t from, size_mtd_t len);
- 
- 
+@@ -145,15 +145,15 @@
+
+	/* This stuff for eXecute-In-Place */
+	/* phys is optional and may be set to NULL */
+-	int (*point) (struct mtd_info *mtd, loff_t from, size_t len,
+-			size_t *retlen, void **virt, resource_size_t *phys);
++	int (*point) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len,
++			size_mtd_t *retlen, void **virt, resource_size_t *phys);
+
+	/* We probably shouldn't allow XIP if the unpoint isn't a NULL */
+-	void (*unpoint) (struct mtd_info *mtd, loff_t from, size_t len);
++	void (*unpoint) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len);
+
+
 -	int (*read) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
 -	int (*write) (struct mtd_info *mtd, loff_t to, size_t len, size_t *retlen, const u_char *buf);
 +	int (*read) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len, size_mtd_t *retlen, u_char *buf);
 +	int (*write) (struct mtd_info *mtd, loff_mtd_t to, size_mtd_t len, size_mtd_t *retlen, const u_char *buf);
- 
+
+	/* In blackbox flight recorder like scenarios we want to make successful
+	   writes in interrupt context. panic_write() is only intended to be
+@@ -164,9 +164,9 @@
+
+	int (*panic_write) (struct mtd_info *mtd, loff_t to, size_t len, size_t *retlen, const u_char *buf);
+
 -	int (*read_oob) (struct mtd_info *mtd, loff_t from,
 +	int (*read_oob) (struct mtd_info *mtd, loff_mtd_t from,
- 			 struct mtd_oob_ops *ops);
+			 struct mtd_oob_ops *ops);
 -	int (*write_oob) (struct mtd_info *mtd, loff_t to,
 +	int (*write_oob) (struct mtd_info *mtd, loff_mtd_t to,
- 			 struct mtd_oob_ops *ops);
- 
- 	/*
+			 struct mtd_oob_ops *ops);
+
+	/*
 @@ -163,33 +163,33 @@
  	 * flash devices. The user data is one time programmable but the
  	 * factory data is read only.
@@ -27539,334 +27538,57 @@
 +	int (*read_user_prot_reg) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len, size_mtd_t *retlen, u_char *buf);
 +	int (*write_user_prot_reg) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len, size_mtd_t *retlen, u_char *buf);
 +	int (*lock_user_prot_reg) (struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len);
- 
+
  	/* kvec-based read/write methods.
  	   NB: The 'count' parameter is the number of _vectors_, each of
  	   which contains an (ofs, len) tuple.
  	*/
 -	int (*writev) (struct mtd_info *mtd, const struct kvec *vecs, unsigned long count, loff_t to, size_t *retlen);
 +	int (*writev) (struct mtd_info *mtd, const struct kvec *vecs, unsigned long count, loff_mtd_t to, size_mtd_t *retlen);
- 
+
  	/* Sync */
  	void (*sync) (struct mtd_info *mtd);
- 
+
  	/* Chip-supported device locking */
 -	int (*lock) (struct mtd_info *mtd, loff_t ofs, size_t len);
 -	int (*unlock) (struct mtd_info *mtd, loff_t ofs, size_t len);
 +	int (*lock) (struct mtd_info *mtd, loff_mtd_t ofs, size_mtd_t len);
 +	int (*unlock) (struct mtd_info *mtd, loff_mtd_t ofs, size_mtd_t len);
- 
+
  	/* Power Management functions */
  	int (*suspend) (struct mtd_info *mtd);
  	void (*resume) (struct mtd_info *mtd);
- 
+
  	/* Bad block management functions */
 -	int (*block_isbad) (struct mtd_info *mtd, loff_t ofs);
 -	int (*block_markbad) (struct mtd_info *mtd, loff_t ofs);
 +	int (*block_isbad) (struct mtd_info *mtd, loff_mtd_t ofs);
 +	int (*block_markbad) (struct mtd_info *mtd, loff_mtd_t ofs);
- 
+
  	struct notifier_block reboot_notifier;  /* default mode before reboot */
- 
+
 @@ -237,10 +237,10 @@
  extern int unregister_mtd_user (struct mtd_notifier *old);
- 
+
  int default_mtd_writev(struct mtd_info *mtd, const struct kvec *vecs,
 -		       unsigned long count, loff_t to, size_t *retlen);
 +		       unsigned long count, loff_mtd_t to, size_mtd_t *retlen);
- 
+
  int default_mtd_readv(struct mtd_info *mtd, struct kvec *vecs,
 -		      unsigned long count, loff_t from, size_t *retlen);
 +		      unsigned long count, loff_mtd_t from, size_mtd_t *retlen);
- 
+
  #ifdef CONFIG_MTD_PARTITIONS
  void mtd_erase_callback(struct erase_info *instr);
---- linux-2.6.24.7.old/include/linux/mtd/mtd.h.orig	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/linux/mtd/mtd.h.orig	2009-04-12 18:01:55.000000000 +0200
-@@ -0,0 +1,274 @@
-+/*
-+ * $Id: mtd.h,v 1.61 2005/11/07 11:14:54 gleixner Exp $
-+ *
-+ * Copyright (C) 1999-2003 David Woodhouse <dwmw2@infradead.org> et al.
-+ *
-+ * Released under GPL
-+ */
-+
-+#ifndef __MTD_MTD_H__
-+#define __MTD_MTD_H__
-+
-+#include <linux/types.h>
-+#include <linux/module.h>
-+#include <linux/uio.h>
-+#include <linux/notifier.h>
-+
-+#include <linux/mtd/compatmac.h>
-+#include <mtd/mtd-abi.h>
-+
-+#define MTD_CHAR_MAJOR 90
-+#define MTD_BLOCK_MAJOR 31
-+#define MAX_MTD_DEVICES 32
-+
-+#define MTD_ERASE_PENDING      	0x01
-+#define MTD_ERASING		0x02
-+#define MTD_ERASE_SUSPEND	0x04
-+#define MTD_ERASE_DONE          0x08
-+#define MTD_ERASE_FAILED        0x10
-+
-+/* If the erase fails, fail_addr might indicate exactly which block failed.  If
-+   fail_addr = 0xffffffff, the failure was not at the device level or was not
-+   specific to any particular block. */
-+struct erase_info {
-+	struct mtd_info *mtd;
-+	u_int32_t addr;
-+	u_int32_t len;
-+	u_int32_t fail_addr;
-+	u_long time;
-+	u_long retries;
-+	u_int dev;
-+	u_int cell;
-+	void (*callback) (struct erase_info *self);
-+	u_long priv;
-+	u_char state;
-+	struct erase_info *next;
-+};
-+
-+struct mtd_erase_region_info {
-+	u_int32_t offset;			/* At which this region starts, from the beginning of the MTD */
-+	u_int32_t erasesize;		/* For this region */
-+	u_int32_t numblocks;		/* Number of blocks of erasesize in this region */
-+	unsigned long *lockmap;		/* If keeping bitmap of locks */
-+};
-+
-+/*
-+ * oob operation modes
-+ *
-+ * MTD_OOB_PLACE:	oob data are placed at the given offset
-+ * MTD_OOB_AUTO:	oob data are automatically placed at the free areas
-+ *			which are defined by the ecclayout
-+ * MTD_OOB_RAW:		mode to read raw data+oob in one chunk. The oob data
-+ *			is inserted into the data. Thats a raw image of the
-+ *			flash contents.
-+ */
-+typedef enum {
-+	MTD_OOB_PLACE,
-+	MTD_OOB_AUTO,
-+	MTD_OOB_RAW,
-+} mtd_oob_mode_t;
-+
-+/**
-+ * struct mtd_oob_ops - oob operation operands
-+ * @mode:	operation mode
-+ *
-+ * @len:	number of data bytes to write/read
-+ *
-+ * @retlen:	number of data bytes written/read
-+ *
-+ * @ooblen:	number of oob bytes to write/read
-+ * @oobretlen:	number of oob bytes written/read
-+ * @ooboffs:	offset of oob data in the oob area (only relevant when
-+ *		mode = MTD_OOB_PLACE)
-+ * @datbuf:	data buffer - if NULL only oob data are read/written
-+ * @oobbuf:	oob data buffer
-+ *
-+ * Note, it is allowed to read more then one OOB area at one go, but not write.
-+ * The interface assumes that the OOB write requests program only one page's
-+ * OOB area.
-+ */
-+struct mtd_oob_ops {
-+	mtd_oob_mode_t	mode;
-+	size_t		len;
-+	size_t		retlen;
-+	size_t		ooblen;
-+	size_t		oobretlen;
-+	uint32_t	ooboffs;
-+	uint8_t		*datbuf;
-+	uint8_t		*oobbuf;
-+};
-+
-+struct mtd_info;
-+struct mtd_info {
-+	u_char type;
-+	u_int32_t flags;
-+	u_int32_t size;	 // Total size of the MTD
-+
-+	/* "Major" erase size for the device. Na√Øve users may take this
-+	 * to be the only erase size available, or may use the more detailed
-+	 * information below if they desire
-+	 */
-+	u_int32_t erasesize;
-+	/* Minimal writable flash unit size. In case of NOR flash it is 1 (even
-+	 * though individual bits can be cleared), in case of NAND flash it is
-+	 * one NAND page (or half, or one-fourths of it), in case of ECC-ed NOR
-+	 * it is of ECC block size, etc. It is illegal to have writesize = 0.
-+	 * Any driver registering a struct mtd_info must ensure a writesize of
-+	 * 1 or larger.
-+	 */
-+	u_int32_t writesize;
-+
-+	u_int32_t oobsize;   // Amount of OOB data per block (e.g. 16)
-+	u_int32_t oobavail;  // Available OOB bytes per block
-+
-+	// Kernel-only stuff starts here.
-+	char *name;
-+	int index;
-+
-+	/* ecc layout structure pointer - read only ! */
-+	struct nand_ecclayout *ecclayout;
-+
-+	/* Data for variable erase regions. If numeraseregions is zero,
-+	 * it means that the whole device has erasesize as given above.
-+	 */
-+	int numeraseregions;
-+	struct mtd_erase_region_info *eraseregions;
-+
-+	/*
-+	 * Erase is an asynchronous operation.  Device drivers are supposed
-+	 * to call instr->callback() whenever the operation completes, even
-+	 * if it completes with a failure.
-+	 * Callers are supposed to pass a callback function and wait for it
-+	 * to be called before writing to the block.
-+	 */
-+	int (*erase) (struct mtd_info *mtd, struct erase_info *instr);
-+
-+	/* This stuff for eXecute-In-Place */
-+	int (*point) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char **mtdbuf);
-+
-+	/* We probably shouldn't allow XIP if the unpoint isn't a NULL */
-+	void (*unpoint) (struct mtd_info *mtd, u_char * addr, loff_t from, size_t len);
-+
-+
-+	int (*read) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
-+	int (*write) (struct mtd_info *mtd, loff_t to, size_t len, size_t *retlen, const u_char *buf);
-+
-+	int (*read_oob) (struct mtd_info *mtd, loff_t from,
-+			 struct mtd_oob_ops *ops);
-+	int (*write_oob) (struct mtd_info *mtd, loff_t to,
-+			 struct mtd_oob_ops *ops);
-+
-+	/*
-+	 * Methods to access the protection register area, present in some
-+	 * flash devices. The user data is one time programmable but the
-+	 * factory data is read only.
-+	 */
-+	int (*get_fact_prot_info) (struct mtd_info *mtd, struct otp_info *buf, size_t len);
-+	int (*read_fact_prot_reg) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
-+	int (*get_user_prot_info) (struct mtd_info *mtd, struct otp_info *buf, size_t len);
-+	int (*read_user_prot_reg) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
-+	int (*write_user_prot_reg) (struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen, u_char *buf);
-+	int (*lock_user_prot_reg) (struct mtd_info *mtd, loff_t from, size_t len);
-+
-+	/* kvec-based read/write methods.
-+	   NB: The 'count' parameter is the number of _vectors_, each of
-+	   which contains an (ofs, len) tuple.
-+	*/
-+	int (*writev) (struct mtd_info *mtd, const struct kvec *vecs, unsigned long count, loff_t to, size_t *retlen);
-+
-+	/* Sync */
-+	void (*sync) (struct mtd_info *mtd);
-+
-+	/* Chip-supported device locking */
-+	int (*lock) (struct mtd_info *mtd, loff_t ofs, size_t len);
-+	int (*unlock) (struct mtd_info *mtd, loff_t ofs, size_t len);
-+
-+	/* Power Management functions */
-+	int (*suspend) (struct mtd_info *mtd);
-+	void (*resume) (struct mtd_info *mtd);
-+
-+	/* Bad block management functions */
-+	int (*block_isbad) (struct mtd_info *mtd, loff_t ofs);
-+	int (*block_markbad) (struct mtd_info *mtd, loff_t ofs);
-+
-+	struct notifier_block reboot_notifier;  /* default mode before reboot */
-+
-+	/* ECC status information */
-+	struct mtd_ecc_stats ecc_stats;
-+	/* Subpage shift (NAND) */
-+	int subpage_sft;
-+
-+	void *priv;
-+
-+	struct module *owner;
-+	int usecount;
-+
-+	int (*refresh_device)(struct mtd_info *mtd);
-+	struct mtd_info *split;
-+
-+	/* If the driver is something smart, like UBI, it may need to maintain
-+	 * its own reference counting. The below functions are only for driver.
-+	 * The driver may register its callbacks. These callbacks are not
-+	 * supposed to be called by MTD users */
-+	int (*get_device) (struct mtd_info *mtd);
-+	void (*put_device) (struct mtd_info *mtd);
-+};
-+
-+
-+	/* Kernel-side ioctl definitions */
-+
-+extern int add_mtd_device(struct mtd_info *mtd);
-+extern int del_mtd_device (struct mtd_info *mtd);
-+
-+extern struct mtd_info *get_mtd_device(struct mtd_info *mtd, int num);
-+extern struct mtd_info *get_mtd_device_nm(const char *name);
-+
-+extern void put_mtd_device(struct mtd_info *mtd);
-+
-+
-+struct mtd_notifier {
-+	void (*add)(struct mtd_info *mtd);
-+	void (*remove)(struct mtd_info *mtd);
-+	struct list_head list;
-+};
-+
-+
-+extern void register_mtd_user (struct mtd_notifier *new);
-+extern int unregister_mtd_user (struct mtd_notifier *old);
-+
-+int default_mtd_writev(struct mtd_info *mtd, const struct kvec *vecs,
-+		       unsigned long count, loff_t to, size_t *retlen);
-+
-+int default_mtd_readv(struct mtd_info *mtd, struct kvec *vecs,
-+		      unsigned long count, loff_t from, size_t *retlen);
-+
-+#ifdef CONFIG_MTD_PARTITIONS
-+void mtd_erase_callback(struct erase_info *instr);
-+#else
-+static inline void mtd_erase_callback(struct erase_info *instr)
-+{
-+	if (instr->callback)
-+		instr->callback(instr);
-+}
-+#endif
-+
-+/*
-+ * Debugging macro and defines
-+ */
-+#define MTD_DEBUG_LEVEL0	(0)	/* Quiet   */
-+#define MTD_DEBUG_LEVEL1	(1)	/* Audible */
-+#define MTD_DEBUG_LEVEL2	(2)	/* Loud    */
-+#define MTD_DEBUG_LEVEL3	(3)	/* Noisy   */
-+
-+#ifdef CONFIG_MTD_DEBUG
-+#define DEBUG(n, args...)				\
-+	do {						\
-+		if (n <= CONFIG_MTD_DEBUG_VERBOSE)	\
-+			printk(KERN_INFO args);		\
-+	} while(0)
-+#else /* CONFIG_MTD_DEBUG */
-+#define DEBUG(n, args...) do { } while(0)
-+
-+#endif /* CONFIG_MTD_DEBUG */
-+
-+#endif /* __MTD_MTD_H__ */
 --- linux-2.6.24.7.old/include/linux/mtd/nand.h	2009-04-12 18:05:07.000000000 +0200
 +++ linux-2.6.24.7/include/linux/mtd/nand.h	2009-04-12 18:13:57.000000000 +0200
 @@ -39,14 +39,14 @@
  extern void nand_wait_ready(struct mtd_info *mtd);
- 
+
  /* The maximum number of NAND chips in an array */
 -#define NAND_MAX_CHIPS		8
 +#define NAND_MAX_CHIPS		4
- 
+
  /* This constant declares the max. oobsize / page, which
   * is supported now. If you add a chip with bigger oobsize/page
   * adjust this accordingly.
@@ -27875,7 +27597,7 @@
 -#define NAND_MAX_PAGESIZE	2048
 +#define NAND_MAX_OOBSIZE	256
 +#define NAND_MAX_PAGESIZE	8192
- 
+
  /*
   * Constants for hardware specific CLE/ALE/NCE function
 @@ -55,6 +55,10 @@
@@ -27913,9 +27635,9 @@
  	int		badblockpos;
 +	int     	realplanenum; /* number of planes the NAND has */
 +	int     	planenum;     /* number of planes operating synchronously */
- 
+
  	nand_state_t	state;
- 
+
 @@ -450,7 +456,7 @@
  	char *name;
  	int id;
@@ -27927,7 +27649,7 @@
  };
 @@ -538,13 +544,13 @@
  #define NAND_BBT_SCAN_MAXBLOCKS	4
- 
+
  extern int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd);
 -extern int nand_update_bbt(struct mtd_info *mtd, loff_t offs);
 +extern int nand_update_bbt(struct mtd_info *mtd, loff_mtd_t offs);
@@ -27940,7 +27662,7 @@
 -			size_t * retlen, uint8_t * buf);
 +extern int nand_do_read(struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len,
 +			size_mtd_t * retlen, uint8_t * buf);
- 
+
  /*
  * Constants for oob configuration
 --- linux-2.6.24.7.old/include/linux/mtd/partitions.h	2009-04-12 18:05:07.000000000 +0200
@@ -27957,121 +27679,6 @@
  	u_int32_t mask_flags;		/* master MTD flags to mask out for this partition */
  	struct nand_ecclayout *ecclayout;	/* out of band layout for this partition (NAND only)*/
  	struct mtd_info **mtdp;		/* pointer to store the MTD object */
---- linux-2.6.24.7.old/include/linux/mtd/partitions.h.orig	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/linux/mtd/partitions.h.orig	2009-04-12 18:01:55.000000000 +0200
-@@ -0,0 +1,78 @@
-+/*
-+ * MTD partitioning layer definitions
-+ *
-+ * (C) 2000 Nicolas Pitre <nico@cam.org>
-+ *
-+ * This code is GPL
-+ *
-+ * $Id: partitions.h,v 1.17 2005/11/07 11:14:55 gleixner Exp $
-+ */
-+
-+#ifndef MTD_PARTITIONS_H
-+#define MTD_PARTITIONS_H
-+
-+#include <linux/types.h>
-+
-+
-+/*
-+ * Partition definition structure:
-+ *
-+ * An array of struct partition is passed along with a MTD object to
-+ * add_mtd_partitions() to create them.
-+ *
-+ * For each partition, these fields are available:
-+ * name: string that will be used to label the partition's MTD device.
-+ * size: the partition size; if defined as MTDPART_SIZ_FULL, the partition
-+ * 	will extend to the end of the master MTD device.
-+ * offset: absolute starting position within the master MTD device; if
-+ * 	defined as MTDPART_OFS_APPEND, the partition will start where the
-+ * 	previous one ended; if MTDPART_OFS_NXTBLK, at the next erase block.
-+ * mask_flags: contains flags that have to be masked (removed) from the
-+ * 	master MTD flag set for the corresponding MTD partition.
-+ * 	For example, to force a read-only partition, simply adding
-+ * 	MTD_WRITEABLE to the mask_flags will do the trick.
-+ *
-+ * Note: writeable partitions require their size and offset be
-+ * erasesize aligned (e.g. use MTDPART_OFS_NEXTBLK).
-+ */
-+
-+struct mtd_partition;
-+struct mtd_partition {
-+	char *name;			/* identifier string */
-+	u_int32_t size;			/* partition size */
-+	u_int32_t offset;		/* offset within the master MTD space */
-+	u_int32_t mask_flags;		/* master MTD flags to mask out for this partition */
-+	struct nand_ecclayout *ecclayout;	/* out of band layout for this partition (NAND only)*/
-+	struct mtd_info **mtdp;		/* pointer to store the MTD object */
-+	int (*refresh_partition)(struct mtd_info *);
-+};
-+
-+#define MTDPART_OFS_NXTBLK	(-2)
-+#define MTDPART_OFS_APPEND	(-1)
-+#define MTDPART_SIZ_FULL	(0)
-+
-+
-+int add_mtd_partitions(struct mtd_info *, const struct mtd_partition *, int);
-+int del_mtd_partitions(struct mtd_info *);
-+int refresh_mtd_partitions(struct mtd_info *);
-+
-+/*
-+ * Functions dealing with the various ways of partitioning the space
-+ */
-+
-+struct mtd_part_parser {
-+	struct list_head list;
-+	struct module *owner;
-+	const char *name;
-+	int (*parse_fn)(struct mtd_info *, struct mtd_partition **, unsigned long);
-+};
-+
-+extern int register_mtd_parser(struct mtd_part_parser *parser);
-+extern int deregister_mtd_parser(struct mtd_part_parser *parser);
-+extern int parse_mtd_partitions(struct mtd_info *master, const char **types,
-+				struct mtd_partition **pparts, unsigned long origin);
-+
-+#define put_partition_parser(p) do { module_put((p)->owner); } while(0)
-+
-+#endif
-+
---- linux-2.6.24.7.old/include/linux/mtd/ubi.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/mtd/ubi.h	2009-04-12 18:13:57.000000000 +0200
-@@ -26,23 +26,6 @@
- #include <mtd/ubi-user.h>
- 
- /*
-- * UBI data type hint constants.
-- *
-- * UBI_LONGTERM: long-term data
-- * UBI_SHORTTERM: short-term data
-- * UBI_UNKNOWN: data persistence is unknown
-- *
-- * These constants are used when data is written to UBI volumes in order to
-- * help the UBI wear-leveling unit to find more appropriate physical
-- * eraseblocks.
-- */
--enum {
--	UBI_LONGTERM = 1,
--	UBI_SHORTTERM,
--	UBI_UNKNOWN
--};
--
--/*
-  * enum ubi_open_mode - UBI volume open mode constants.
-  *
-  * UBI_READONLY: read-only mode
-@@ -167,6 +150,7 @@
- 		   int len, int dtype);
- int ubi_leb_erase(struct ubi_volume_desc *desc, int lnum);
- int ubi_leb_unmap(struct ubi_volume_desc *desc, int lnum);
-+int ubi_leb_map(struct ubi_volume_desc *desc, int lnum, int dtype);
- int ubi_is_mapped(struct ubi_volume_desc *desc, int lnum);
- 
- /*
 --- linux-2.6.24.7.old/include/linux/vt.h	2008-05-07 01:22:34.000000000 +0200
 +++ linux-2.6.24.7/include/linux/vt.h	2009-04-12 18:13:57.000000000 +0200
 @@ -18,10 +18,16 @@
@@ -28089,28 +27696,18 @@
 +#else
 +#define MAX_NR_CONSOLES 63	/* serial lines start at 64 */
 +#define MAX_NR_USER_CONSOLES 63 /* must be root to allocate above this */
-+                  /* Note: the ioctl VT_GETSTATE does not work for 
++                  /* Note: the ioctl VT_GETSTATE does not work for
 +		     consoles 16 and higher (since it returns a short) */
 +#endif
- 
+
  /* 0x56 is 'V', to avoid collision with termios and kd */
- 
---- linux-2.6.24.7.old/include/linux/writeback.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/writeback.h	2009-04-12 18:13:57.000000000 +0200
-@@ -70,6 +70,7 @@
- void writeback_inodes(struct writeback_control *wbc);
- int inode_wait(void *);
- void sync_inodes_sb(struct super_block *, int wait);
-+void writeback_inodes_sb(struct super_block *sb, struct writeback_control *wbc);
- void sync_inodes(int wait);
- 
- /* writeback.h requires fs.h; it, too, is not included from here. */
+
 --- linux-2.6.24.7.old/include/mtd/mtd-abi.h	2009-04-12 18:05:07.000000000 +0200
 +++ linux-2.6.24.7/include/mtd/mtd-abi.h	2009-04-12 18:23:10.000000000 +0200
 @@ -7,9 +7,18 @@
  #ifndef __MTD_ABI_H__
  #define __MTD_ABI_H__
- 
+
 +
 +#ifndef __KERNEL__ /* Urgh. The whole point of splitting this out into
 +                   separate files was to avoid #ifdef __KERNEL__ */
@@ -28126,12 +27723,12 @@
 +	uint64_t start;
 +	uint64_t length;
  };
- 
+
  struct mtd_oob_buf {
 @@ -18,6 +27,14 @@
  	unsigned char __user *ptr;
  };
- 
+
 +struct mtd_page_buf {
 +	uint32_t start;      //page start address
 +	uint32_t ooblength;
@@ -28154,7 +27751,7 @@
  	uint32_t oobsize;   // Amount of OOB data per block (e.g. 16)
 @@ -63,7 +80,7 @@
  };
- 
+
  struct region_info_user {
 -	uint32_t offset;		/* At which this region starts,
 +	uint64_t offset;		/* At which this region starts,
@@ -28178,7 +27775,7 @@
  #define MTDFILEMODE		_IO('M', 19)
 +#define MEMWRITEPAGE           _IOWR('M', 20, struct mtd_page_buf)
  #define MTDREFRESH		_IO('M', 23)
- 
+
  /*
 @@ -105,7 +123,7 @@
  	uint32_t useecc;
@@ -28187,7 +27784,7 @@
 -	uint32_t eccpos[32];
 +	uint32_t eccpos[104];
  };
- 
+
  struct nand_oobfree {
 @@ -120,7 +138,7 @@
   */
@@ -28198,222 +27795,6 @@
  	uint32_t oobavail;
  	struct nand_oobfree oobfree[MTD_MAX_OOBFREE_ENTRIES];
  };
---- linux-2.6.24.7.old/include/mtd/ubi-user.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/mtd/ubi-user.h	2009-04-12 18:13:57.000000000 +0200
-@@ -21,7 +21,26 @@
- #ifndef __UBI_USER_H__
- #define __UBI_USER_H__
- 
-+#ifndef __KERNEL__ /* Urgh. The whole point of splitting this out into
-+		    separate files was to avoid #ifdef __KERNEL__ */
-+#define __user
-+#endif
- /*
-+ * UBI device creation (the same as MTD device attachment)
-+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ * MTD devices may be attached using %UBI_IOCATT ioctl command of the UBI
-+ * control device. The caller has to properly fill and pass
-+ * &struct ubi_attach_req object - UBI will attach the MTD device specified in
-+ * the request and return the newly created UBI device number as the ioctl
-+ * return value.
-+ *
-+ * UBI device deletion (the same as MTD device detachment)
-+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ * An UBI device maybe deleted with %UBI_IOCDET ioctl command of the UBI
-+ * control device.
-+ *
-  * UBI volume creation
-  * ~~~~~~~~~~~~~~~~~~~
-  *
-@@ -48,7 +67,7 @@
-  *
-  * Volume update should be done via the %UBI_IOCVOLUP IOCTL command of the
-  * corresponding UBI volume character device. A pointer to a 64-bit update
-- * size should be passed to the IOCTL. After then, UBI expects user to write
-+ * size should be passed to the IOCTL. After this, UBI expects user to write
-  * this number of bytes to the volume character device. The update is finished
-  * when the claimed number of bytes is passed. So, the volume update sequence
-  * is something like:
-@@ -57,14 +76,24 @@
-  * ioctl(fd, UBI_IOCVOLUP, &image_size);
-  * write(fd, buf, image_size);
-  * close(fd);
-+ *
-+ * Atomic eraseblock change
-+ * ~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ * Atomic eraseblock change operation is done via the %UBI_IOCEBCH IOCTL
-+ * command of the corresponding UBI volume character device. A pointer to
-+ * &struct ubi_leb_change_req has to be passed to the IOCTL. Then the user is
-+ * expected to write the requested amount of bytes. This is similar to the
-+ * "volume update" IOCTL.
-  */
- 
- /*
-- * When a new volume is created, users may either specify the volume number they
-- * want to create or to let UBI automatically assign a volume number using this
-- * constant.
-+ * When a new UBI volume or UBI device is created, users may either specify the
-+ * volume/device number they want to create or to let UBI automatically assign
-+ * the number using these constants.
-  */
- #define UBI_VOL_NUM_AUTO (-1)
-+#define UBI_DEV_NUM_AUTO (-1)
- 
- /* Maximum volume name length */
- #define UBI_MAX_VOLUME_NAME 127
-@@ -80,6 +109,15 @@
- /* Re-size an UBI volume */
- #define UBI_IOCRSVOL _IOW(UBI_IOC_MAGIC, 2, struct ubi_rsvol_req)
- 
-+/* IOCTL commands of the UBI control character device */
-+
-+#define UBI_CTRL_IOC_MAGIC 'o'
-+
-+/* Attach an MTD device */
-+#define UBI_IOCATT _IOW(UBI_CTRL_IOC_MAGIC, 64, struct ubi_attach_req)
-+/* Detach an MTD device */
-+#define UBI_IOCDET _IOW(UBI_CTRL_IOC_MAGIC, 65, int32_t)
-+
- /* IOCTL commands of UBI volume character devices */
- 
- #define UBI_VOL_IOC_MAGIC 'O'
-@@ -88,6 +126,30 @@
- #define UBI_IOCVOLUP _IOW(UBI_VOL_IOC_MAGIC, 0, int64_t)
- /* An eraseblock erasure command, used for debugging, disabled by default */
- #define UBI_IOCEBER _IOW(UBI_VOL_IOC_MAGIC, 1, int32_t)
-+/* An atomic eraseblock change command */
-+#define UBI_IOCEBCH _IOW(UBI_VOL_IOC_MAGIC, 2, int32_t)
-+/* Start UBI leb read */
-+#define UBI_IOCLEBREAD _IOWR(UBI_VOL_IOC_MAGIC, 3, struct ubi_leb)
-+
-+/* Maximum MTD device name length supported by UBI */
-+#define MAX_UBI_MTD_NAME_LEN 127
-+
-+/*
-+ * UBI data type hint constants.
-+ *
-+ * UBI_LONGTERM: long-term data
-+ * UBI_SHORTTERM: short-term data
-+ * UBI_UNKNOWN: data persistence is unknown
-+ *
-+ * These constants are used when data is written to UBI volumes in order to
-+ * help the UBI wear-leveling unit to find more appropriate physical
-+ * eraseblocks.
-+ */
-+enum {
-+	UBI_LONGTERM  = 1,
-+	UBI_SHORTTERM = 2,
-+	UBI_UNKNOWN   = 3,
-+};
- 
- /*
-  * UBI volume type constants.
-@@ -97,22 +159,58 @@
-  */
- enum {
- 	UBI_DYNAMIC_VOLUME = 3,
--	UBI_STATIC_VOLUME = 4
-+	UBI_STATIC_VOLUME  = 4,
-+};
-+
-+/**
-+ * struct ubi_attach_req - attach MTD device request.
-+ * @ubi_num: UBI device number to create
-+ * @mtd_num: MTD device number to attach
-+ * @vid_hdr_offset: VID header offset (use defaults if %0)
-+ * @padding: reserved for future, not used, has to be zeroed
-+ *
-+ * This data structure is used to specify MTD device UBI has to attach and the
-+ * parameters it has to use. The number which should be assigned to the new UBI
-+ * device is passed in @ubi_num. UBI may automatically assign the number if
-+ * @UBI_DEV_NUM_AUTO is passed. In this case, the device number is returned in
-+ * @ubi_num.
-+ *
-+ * Most applications should pass %0 in @vid_hdr_offset to make UBI use default
-+ * offset of the VID header within physical eraseblocks. The default offset is
-+ * the next min. I/O unit after the EC header. For example, it will be offset
-+ * 512 in case of a 512 bytes page NAND flash with no sub-page support. Or
-+ * it will be 512 in case of a 2KiB page NAND flash with 4 512-byte sub-pages.
-+ *
-+ * But in rare cases, if this optimizes things, the VID header may be placed to
-+ * a different offset. For example, the boot-loader might do things faster if the
-+ * VID header sits at the end of the first 2KiB NAND page with 4 sub-pages. As
-+ * the boot-loader would not normally need to read EC headers (unless it needs
-+ * UBI in RW mode), it might be faster to calculate ECC. This is weird example,
-+ * but it real-life example. So, in this example, @vid_hdr_offer would be
-+ * 2KiB-64 bytes = 1984. Note, that this position is not even 512-bytes
-+ * aligned, which is OK, as UBI is clever enough to realize this is 4th sub-page
-+ * of the first page and add needed padding.
-+ */
-+struct ubi_attach_req {
-+	int32_t ubi_num;
-+	int32_t mtd_num;
-+	int32_t vid_hdr_offset;
-+	uint8_t padding[12];
- };
- 
- /**
-  * struct ubi_mkvol_req - volume description data structure used in
-- * volume creation requests.
-+ *                        volume creation requests.
-  * @vol_id: volume number
-  * @alignment: volume alignment
-  * @bytes: volume size in bytes
-  * @vol_type: volume type (%UBI_DYNAMIC_VOLUME or %UBI_STATIC_VOLUME)
-- * @padding1: reserved for future, not used
-+ * @padding1: reserved for future, not used, has to be zeroed
-  * @name_len: volume name length
-- * @padding2: reserved for future, not used
-+ * @padding2: reserved for future, not used, has to be zeroed
-  * @name: volume name
-  *
-- * This structure is used by userspace programs when creating new volumes. The
-+ * This structure is used by user-space programs when creating new volumes. The
-  * @used_bytes field is only necessary when creating static volumes.
-  *
-  * The @alignment field specifies the required alignment of the volume logical
-@@ -139,7 +237,7 @@
- 	int8_t padding1;
- 	int16_t name_len;
- 	int8_t padding2[4];
--	char name[UBI_MAX_VOLUME_NAME+1];
-+	char name[UBI_MAX_VOLUME_NAME + 1];
- } __attribute__ ((packed));
- 
- /**
-@@ -158,4 +256,29 @@
- 	int32_t vol_id;
- } __attribute__ ((packed));
- 
-+/**
-+ * struct ubi_leb_change_req - a data structure used in atomic logical
-+ *                             eraseblock change requests.
-+ * @lnum: logical eraseblock number to change
-+ * @bytes: how many bytes will be written to the logical eraseblock
-+ * @dtype: data type (%UBI_LONGTERM, %UBI_SHORTTERM, %UBI_UNKNOWN)
-+ * @padding: reserved for future, not used, has to be zeroed
-+ */
-+struct ubi_leb_change_req {
-+	int32_t lnum;
-+	int32_t bytes;
-+	uint8_t dtype;
-+	uint8_t padding[7];
-+} __attribute__ ((packed));
-+
-+/**
-+ * struct ubi_leb - a data structure describe LEB.
-+ * @lnum: logical eraseblock number to dump
-+ * @lebbuf: LEB data buffer
-+ */
-+struct ubi_leb{
-+	unsigned int lnum;
-+	char __user *buf;
-+};
-+
- #endif /* __UBI_USER_H__ */
 --- linux-2.6.24.7.old/include/sound/pcm.h	2008-05-07 01:22:34.000000000 +0200
 +++ linux-2.6.24.7/include/sound/pcm.h	2009-04-12 18:13:57.000000000 +0200
 @@ -107,23 +107,23 @@
@@ -28442,10 +27823,10 @@
 +#define SNDRV_PCM_RATE_96000		(1<<12)		/* 96000Hz */
 +#define SNDRV_PCM_RATE_176400		(1<<13)		/* 176400Hz */
 +#define SNDRV_PCM_RATE_192000		(1<<14)		/* 192000Hz */
- 
+
  #define SNDRV_PCM_RATE_CONTINUOUS	(1<<30)		/* continuous range */
  #define SNDRV_PCM_RATE_KNOT		(1<<31)		/* supports more non-continuos rates */
- 
+
 -#define SNDRV_PCM_RATE_8000_44100	(SNDRV_PCM_RATE_8000|SNDRV_PCM_RATE_11025|\
 -					 SNDRV_PCM_RATE_16000|SNDRV_PCM_RATE_22050|\
 -					 SNDRV_PCM_RATE_32000|SNDRV_PCM_RATE_44100)
@@ -28453,1017 +27834,3 @@
  #define SNDRV_PCM_RATE_8000_48000	(SNDRV_PCM_RATE_8000_44100|SNDRV_PCM_RATE_48000)
  #define SNDRV_PCM_RATE_8000_96000	(SNDRV_PCM_RATE_8000_48000|SNDRV_PCM_RATE_64000|\
  					 SNDRV_PCM_RATE_88200|SNDRV_PCM_RATE_96000)
---- linux-2.6.24.7.old/include/sound/pcm.h.org	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/include/sound/pcm.h.org	2009-04-12 18:13:57.000000000 +0200
-@@ -0,0 +1,1011 @@
-+#ifndef __SOUND_PCM_H
-+#define __SOUND_PCM_H
-+
-+/*
-+ *  Digital Audio (PCM) abstract layer
-+ *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
-+ *                   Abramo Bagnara <abramo@alsa-project.org>
-+ *
-+ *
-+ *   This program is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU General Public License as published by
-+ *   the Free Software Foundation; either version 2 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU General Public License
-+ *   along with this program; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-+ *
-+ */
-+
-+#include <sound/asound.h>
-+#include <sound/memalloc.h>
-+#include <linux/poll.h>
-+#include <linux/mm.h>
-+#include <linux/bitops.h>
-+
-+#define snd_pcm_substream_chip(substream) ((substream)->private_data)
-+#define snd_pcm_chip(pcm) ((pcm)->private_data)
-+
-+#if defined(CONFIG_SND_PCM_OSS) || defined(CONFIG_SND_PCM_OSS_MODULE)
-+#include "pcm_oss.h"
-+#endif
-+
-+/*
-+ *  Hardware (lowlevel) section
-+ */
-+
-+struct snd_pcm_hardware {
-+	unsigned int info;		/* SNDRV_PCM_INFO_* */
-+	u64 formats;			/* SNDRV_PCM_FMTBIT_* */
-+	unsigned int rates;		/* SNDRV_PCM_RATE_* */
-+	unsigned int rate_min;		/* min rate */
-+	unsigned int rate_max;		/* max rate */
-+	unsigned int channels_min;	/* min channels */
-+	unsigned int channels_max;	/* max channels */
-+	size_t buffer_bytes_max;	/* max buffer size */
-+	size_t period_bytes_min;	/* min period size */
-+	size_t period_bytes_max;	/* max period size */
-+	unsigned int periods_min;	/* min # of periods */
-+	unsigned int periods_max;	/* max # of periods */
-+	size_t fifo_size;		/* fifo size in bytes */
-+};
-+
-+struct snd_pcm_substream;
-+
-+struct snd_pcm_ops {
-+	int (*open)(struct snd_pcm_substream *substream);
-+	int (*close)(struct snd_pcm_substream *substream);
-+	int (*ioctl)(struct snd_pcm_substream * substream,
-+		     unsigned int cmd, void *arg);
-+	int (*hw_params)(struct snd_pcm_substream *substream,
-+			 struct snd_pcm_hw_params *params);
-+	int (*hw_free)(struct snd_pcm_substream *substream);
-+	int (*prepare)(struct snd_pcm_substream *substream);
-+	int (*trigger)(struct snd_pcm_substream *substream, int cmd);
-+	snd_pcm_uframes_t (*pointer)(struct snd_pcm_substream *substream);
-+	int (*copy)(struct snd_pcm_substream *substream, int channel,
-+		    snd_pcm_uframes_t pos,
-+		    void __user *buf, snd_pcm_uframes_t count);
-+	int (*silence)(struct snd_pcm_substream *substream, int channel, 
-+		       snd_pcm_uframes_t pos, snd_pcm_uframes_t count);
-+	struct page *(*page)(struct snd_pcm_substream *substream,
-+			     unsigned long offset);
-+	int (*mmap)(struct snd_pcm_substream *substream, struct vm_area_struct *vma);
-+	int (*ack)(struct snd_pcm_substream *substream);
-+};
-+
-+/*
-+ *
-+ */
-+
-+#define SNDRV_PCM_DEVICES		8
-+
-+#define SNDRV_PCM_IOCTL1_FALSE		((void *)0)
-+#define SNDRV_PCM_IOCTL1_TRUE		((void *)1)
-+
-+#define SNDRV_PCM_IOCTL1_RESET		0
-+#define SNDRV_PCM_IOCTL1_INFO		1
-+#define SNDRV_PCM_IOCTL1_CHANNEL_INFO	2
-+#define SNDRV_PCM_IOCTL1_GSTATE		3
-+
-+#define SNDRV_PCM_TRIGGER_STOP		0
-+#define SNDRV_PCM_TRIGGER_START		1
-+#define SNDRV_PCM_TRIGGER_PAUSE_PUSH	3
-+#define SNDRV_PCM_TRIGGER_PAUSE_RELEASE	4
-+#define SNDRV_PCM_TRIGGER_SUSPEND	5
-+#define SNDRV_PCM_TRIGGER_RESUME	6
-+
-+#define SNDRV_PCM_POS_XRUN		((snd_pcm_uframes_t)-1)
-+
-+/* If you change this don't forget to change rates[] table in pcm_native.c */
-+#define SNDRV_PCM_RATE_5512		(1<<0)		/* 5512Hz */
-+#define SNDRV_PCM_RATE_8000		(1<<1)		/* 8000Hz */
-+#define SNDRV_PCM_RATE_11025		(1<<2)		/* 11025Hz */
-+#define SNDRV_PCM_RATE_16000		(1<<3)		/* 16000Hz */
-+#define SNDRV_PCM_RATE_22050		(1<<4)		/* 22050Hz */
-+#define SNDRV_PCM_RATE_32000		(1<<5)		/* 32000Hz */
-+#define SNDRV_PCM_RATE_44100		(1<<6)		/* 44100Hz */
-+#define SNDRV_PCM_RATE_48000		(1<<7)		/* 48000Hz */
-+#define SNDRV_PCM_RATE_64000		(1<<8)		/* 64000Hz */
-+#define SNDRV_PCM_RATE_88200		(1<<9)		/* 88200Hz */
-+#define SNDRV_PCM_RATE_96000		(1<<10)		/* 96000Hz */
-+#define SNDRV_PCM_RATE_176400		(1<<11)		/* 176400Hz */
-+#define SNDRV_PCM_RATE_192000		(1<<12)		/* 192000Hz */
-+
-+#define SNDRV_PCM_RATE_CONTINUOUS	(1<<30)		/* continuous range */
-+#define SNDRV_PCM_RATE_KNOT		(1<<31)		/* supports more non-continuos rates */
-+
-+#define SNDRV_PCM_RATE_8000_44100	(SNDRV_PCM_RATE_8000|SNDRV_PCM_RATE_11025|\
-+					 SNDRV_PCM_RATE_16000|SNDRV_PCM_RATE_22050|\
-+					 SNDRV_PCM_RATE_32000|SNDRV_PCM_RATE_44100)
-+#define SNDRV_PCM_RATE_8000_48000	(SNDRV_PCM_RATE_8000_44100|SNDRV_PCM_RATE_48000)
-+#define SNDRV_PCM_RATE_8000_96000	(SNDRV_PCM_RATE_8000_48000|SNDRV_PCM_RATE_64000|\
-+					 SNDRV_PCM_RATE_88200|SNDRV_PCM_RATE_96000)
-+#define SNDRV_PCM_RATE_8000_192000	(SNDRV_PCM_RATE_8000_96000|SNDRV_PCM_RATE_176400|\
-+					 SNDRV_PCM_RATE_192000)
-+#define SNDRV_PCM_FMTBIT_S8		(1ULL << SNDRV_PCM_FORMAT_S8)
-+#define SNDRV_PCM_FMTBIT_U8		(1ULL << SNDRV_PCM_FORMAT_U8)
-+#define SNDRV_PCM_FMTBIT_S16_LE		(1ULL << SNDRV_PCM_FORMAT_S16_LE)
-+#define SNDRV_PCM_FMTBIT_S16_BE		(1ULL << SNDRV_PCM_FORMAT_S16_BE)
-+#define SNDRV_PCM_FMTBIT_U16_LE		(1ULL << SNDRV_PCM_FORMAT_U16_LE)
-+#define SNDRV_PCM_FMTBIT_U16_BE		(1ULL << SNDRV_PCM_FORMAT_U16_BE)
-+#define SNDRV_PCM_FMTBIT_S24_LE		(1ULL << SNDRV_PCM_FORMAT_S24_LE)
-+#define SNDRV_PCM_FMTBIT_S24_BE		(1ULL << SNDRV_PCM_FORMAT_S24_BE)
-+#define SNDRV_PCM_FMTBIT_U24_LE		(1ULL << SNDRV_PCM_FORMAT_U24_LE)
-+#define SNDRV_PCM_FMTBIT_U24_BE		(1ULL << SNDRV_PCM_FORMAT_U24_BE)
-+#define SNDRV_PCM_FMTBIT_S32_LE		(1ULL << SNDRV_PCM_FORMAT_S32_LE)
-+#define SNDRV_PCM_FMTBIT_S32_BE		(1ULL << SNDRV_PCM_FORMAT_S32_BE)
-+#define SNDRV_PCM_FMTBIT_U32_LE		(1ULL << SNDRV_PCM_FORMAT_U32_LE)
-+#define SNDRV_PCM_FMTBIT_U32_BE		(1ULL << SNDRV_PCM_FORMAT_U32_BE)
-+#define SNDRV_PCM_FMTBIT_FLOAT_LE	(1ULL << SNDRV_PCM_FORMAT_FLOAT_LE)
-+#define SNDRV_PCM_FMTBIT_FLOAT_BE	(1ULL << SNDRV_PCM_FORMAT_FLOAT_BE)
-+#define SNDRV_PCM_FMTBIT_FLOAT64_LE	(1ULL << SNDRV_PCM_FORMAT_FLOAT64_LE)
-+#define SNDRV_PCM_FMTBIT_FLOAT64_BE	(1ULL << SNDRV_PCM_FORMAT_FLOAT64_BE)
-+#define SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_LE (1ULL << SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE)
-+#define SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_BE (1ULL << SNDRV_PCM_FORMAT_IEC958_SUBFRAME_BE)
-+#define SNDRV_PCM_FMTBIT_MU_LAW		(1ULL << SNDRV_PCM_FORMAT_MU_LAW)
-+#define SNDRV_PCM_FMTBIT_A_LAW		(1ULL << SNDRV_PCM_FORMAT_A_LAW)
-+#define SNDRV_PCM_FMTBIT_IMA_ADPCM	(1ULL << SNDRV_PCM_FORMAT_IMA_ADPCM)
-+#define SNDRV_PCM_FMTBIT_MPEG		(1ULL << SNDRV_PCM_FORMAT_MPEG)
-+#define SNDRV_PCM_FMTBIT_GSM		(1ULL << SNDRV_PCM_FORMAT_GSM)
-+#define SNDRV_PCM_FMTBIT_SPECIAL	(1ULL << SNDRV_PCM_FORMAT_SPECIAL)
-+#define SNDRV_PCM_FMTBIT_S24_3LE	(1ULL << SNDRV_PCM_FORMAT_S24_3LE)
-+#define SNDRV_PCM_FMTBIT_U24_3LE	(1ULL << SNDRV_PCM_FORMAT_U24_3LE)
-+#define SNDRV_PCM_FMTBIT_S24_3BE	(1ULL << SNDRV_PCM_FORMAT_S24_3BE)
-+#define SNDRV_PCM_FMTBIT_U24_3BE	(1ULL << SNDRV_PCM_FORMAT_U24_3BE)
-+#define SNDRV_PCM_FMTBIT_S20_3LE	(1ULL << SNDRV_PCM_FORMAT_S20_3LE)
-+#define SNDRV_PCM_FMTBIT_U20_3LE	(1ULL << SNDRV_PCM_FORMAT_U20_3LE)
-+#define SNDRV_PCM_FMTBIT_S20_3BE	(1ULL << SNDRV_PCM_FORMAT_S20_3BE)
-+#define SNDRV_PCM_FMTBIT_U20_3BE	(1ULL << SNDRV_PCM_FORMAT_U20_3BE)
-+#define SNDRV_PCM_FMTBIT_S18_3LE	(1ULL << SNDRV_PCM_FORMAT_S18_3LE)
-+#define SNDRV_PCM_FMTBIT_U18_3LE	(1ULL << SNDRV_PCM_FORMAT_U18_3LE)
-+#define SNDRV_PCM_FMTBIT_S18_3BE	(1ULL << SNDRV_PCM_FORMAT_S18_3BE)
-+#define SNDRV_PCM_FMTBIT_U18_3BE	(1ULL << SNDRV_PCM_FORMAT_U18_3BE)
-+
-+#ifdef SNDRV_LITTLE_ENDIAN
-+#define SNDRV_PCM_FMTBIT_S16		SNDRV_PCM_FMTBIT_S16_LE
-+#define SNDRV_PCM_FMTBIT_U16		SNDRV_PCM_FMTBIT_U16_LE
-+#define SNDRV_PCM_FMTBIT_S24		SNDRV_PCM_FMTBIT_S24_LE
-+#define SNDRV_PCM_FMTBIT_U24		SNDRV_PCM_FMTBIT_U24_LE
-+#define SNDRV_PCM_FMTBIT_S32		SNDRV_PCM_FMTBIT_S32_LE
-+#define SNDRV_PCM_FMTBIT_U32		SNDRV_PCM_FMTBIT_U32_LE
-+#define SNDRV_PCM_FMTBIT_FLOAT		SNDRV_PCM_FMTBIT_FLOAT_LE
-+#define SNDRV_PCM_FMTBIT_FLOAT64	SNDRV_PCM_FMTBIT_FLOAT64_LE
-+#define SNDRV_PCM_FMTBIT_IEC958_SUBFRAME SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_LE
-+#endif
-+#ifdef SNDRV_BIG_ENDIAN
-+#define SNDRV_PCM_FMTBIT_S16		SNDRV_PCM_FMTBIT_S16_BE
-+#define SNDRV_PCM_FMTBIT_U16		SNDRV_PCM_FMTBIT_U16_BE
-+#define SNDRV_PCM_FMTBIT_S24		SNDRV_PCM_FMTBIT_S24_BE
-+#define SNDRV_PCM_FMTBIT_U24		SNDRV_PCM_FMTBIT_U24_BE
-+#define SNDRV_PCM_FMTBIT_S32		SNDRV_PCM_FMTBIT_S32_BE
-+#define SNDRV_PCM_FMTBIT_U32		SNDRV_PCM_FMTBIT_U32_BE
-+#define SNDRV_PCM_FMTBIT_FLOAT		SNDRV_PCM_FMTBIT_FLOAT_BE
-+#define SNDRV_PCM_FMTBIT_FLOAT64	SNDRV_PCM_FMTBIT_FLOAT64_BE
-+#define SNDRV_PCM_FMTBIT_IEC958_SUBFRAME SNDRV_PCM_FMTBIT_IEC958_SUBFRAME_BE
-+#endif
-+
-+struct snd_pcm_file {
-+	struct snd_pcm_substream *substream;
-+	int no_compat_mmap;
-+};
-+
-+struct snd_pcm_hw_rule;
-+typedef int (*snd_pcm_hw_rule_func_t)(struct snd_pcm_hw_params *params,
-+				      struct snd_pcm_hw_rule *rule);
-+
-+struct snd_pcm_hw_rule {
-+	unsigned int cond;
-+	snd_pcm_hw_rule_func_t func;
-+	int var;
-+	int deps[4];
-+	void *private;
-+};
-+
-+struct snd_pcm_hw_constraints {
-+	struct snd_mask masks[SNDRV_PCM_HW_PARAM_LAST_MASK - 
-+			 SNDRV_PCM_HW_PARAM_FIRST_MASK + 1];
-+	struct snd_interval intervals[SNDRV_PCM_HW_PARAM_LAST_INTERVAL -
-+			     SNDRV_PCM_HW_PARAM_FIRST_INTERVAL + 1];
-+	unsigned int rules_num;
-+	unsigned int rules_all;
-+	struct snd_pcm_hw_rule *rules;
-+};
-+
-+static inline struct snd_mask *constrs_mask(struct snd_pcm_hw_constraints *constrs,
-+					    snd_pcm_hw_param_t var)
-+{
-+	return &constrs->masks[var - SNDRV_PCM_HW_PARAM_FIRST_MASK];
-+}
-+
-+static inline struct snd_interval *constrs_interval(struct snd_pcm_hw_constraints *constrs,
-+						    snd_pcm_hw_param_t var)
-+{
-+	return &constrs->intervals[var - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
-+}
-+
-+struct snd_ratnum {
-+	unsigned int num;
-+	unsigned int den_min, den_max, den_step;
-+};
-+
-+struct snd_ratden {
-+	unsigned int num_min, num_max, num_step;
-+	unsigned int den;
-+};
-+
-+struct snd_pcm_hw_constraint_ratnums {
-+	int nrats;
-+	struct snd_ratnum *rats;
-+};
-+
-+struct snd_pcm_hw_constraint_ratdens {
-+	int nrats;
-+	struct snd_ratden *rats;
-+};
-+
-+struct snd_pcm_hw_constraint_list {
-+	unsigned int count;
-+	unsigned int *list;
-+	unsigned int mask;
-+};
-+
-+struct snd_pcm_runtime {
-+	/* -- Status -- */
-+	struct snd_pcm_substream *trigger_master;
-+	struct timespec trigger_tstamp;	/* trigger timestamp */
-+	int overrange;
-+	snd_pcm_uframes_t avail_max;
-+	snd_pcm_uframes_t hw_ptr_base;	/* Position at buffer restart */
-+	snd_pcm_uframes_t hw_ptr_interrupt; /* Position at interrupt time*/
-+
-+	/* -- HW params -- */
-+	snd_pcm_access_t access;	/* access mode */
-+	snd_pcm_format_t format;	/* SNDRV_PCM_FORMAT_* */
-+	snd_pcm_subformat_t subformat;	/* subformat */
-+	unsigned int rate;		/* rate in Hz */
-+	unsigned int channels;		/* channels */
-+	snd_pcm_uframes_t period_size;	/* period size */
-+	unsigned int periods;		/* periods */
-+	snd_pcm_uframes_t buffer_size;	/* buffer size */
-+	unsigned int tick_time;		/* tick time */
-+	snd_pcm_uframes_t min_align;	/* Min alignment for the format */
-+	size_t byte_align;
-+	unsigned int frame_bits;
-+	unsigned int sample_bits;
-+	unsigned int info;
-+	unsigned int rate_num;
-+	unsigned int rate_den;
-+
-+	/* -- SW params -- */
-+	int tstamp_mode;		/* mmap timestamp is updated */
-+  	unsigned int period_step;
-+	unsigned int sleep_min;		/* min ticks to sleep */
-+	snd_pcm_uframes_t xfer_align;	/* xfer size need to be a multiple */
-+	snd_pcm_uframes_t start_threshold;
-+	snd_pcm_uframes_t stop_threshold;
-+	snd_pcm_uframes_t silence_threshold; /* Silence filling happens when
-+						noise is nearest than this */
-+	snd_pcm_uframes_t silence_size;	/* Silence filling size */
-+	snd_pcm_uframes_t boundary;	/* pointers wrap point */
-+
-+	snd_pcm_uframes_t silence_start; /* starting pointer to silence area */
-+	snd_pcm_uframes_t silence_filled; /* size filled with silence */
-+
-+	union snd_pcm_sync_id sync;	/* hardware synchronization ID */
-+
-+	/* -- mmap -- */
-+	struct snd_pcm_mmap_status *status;
-+	struct snd_pcm_mmap_control *control;
-+
-+	/* -- locking / scheduling -- */
-+	wait_queue_head_t sleep;
-+	struct timer_list tick_timer;
-+	struct fasync_struct *fasync;
-+
-+	/* -- private section -- */
-+	void *private_data;
-+	void (*private_free)(struct snd_pcm_runtime *runtime);
-+
-+	/* -- hardware description -- */
-+	struct snd_pcm_hardware hw;
-+	struct snd_pcm_hw_constraints hw_constraints;
-+
-+	/* -- interrupt callbacks -- */
-+	void (*transfer_ack_begin)(struct snd_pcm_substream *substream);
-+	void (*transfer_ack_end)(struct snd_pcm_substream *substream);
-+
-+	/* -- timer -- */
-+	unsigned int timer_resolution;	/* timer resolution */
-+
-+	/* -- DMA -- */           
-+	unsigned char *dma_area;	/* DMA area */
-+	dma_addr_t dma_addr;		/* physical bus address (not accessible from main CPU) */
-+	size_t dma_bytes;		/* size of DMA area */
-+
-+	struct snd_dma_buffer *dma_buffer_p;	/* allocated buffer */
-+
-+#if defined(CONFIG_SND_PCM_OSS) || defined(CONFIG_SND_PCM_OSS_MODULE)
-+	/* -- OSS things -- */
-+	struct snd_pcm_oss_runtime oss;
-+#endif
-+};
-+
-+struct snd_pcm_group {		/* keep linked substreams */
-+	spinlock_t lock;
-+	struct list_head substreams;
-+	int count;
-+};
-+
-+struct snd_pcm_substream {
-+	struct snd_pcm *pcm;
-+	struct snd_pcm_str *pstr;
-+	void *private_data;		/* copied from pcm->private_data */
-+	int number;
-+	char name[32];			/* substream name */
-+	int stream;			/* stream (direction) */
-+	char latency_id[20];		/* latency identifier */
-+	size_t buffer_bytes_max;	/* limit ring buffer size */
-+	struct snd_dma_buffer dma_buffer;
-+	unsigned int dma_buf_id;
-+	size_t dma_max;
-+	/* -- hardware operations -- */
-+	struct snd_pcm_ops *ops;
-+	/* -- runtime information -- */
-+	struct snd_pcm_runtime *runtime;
-+        /* -- timer section -- */
-+	struct snd_timer *timer;		/* timer */
-+	unsigned timer_running: 1;	/* time is running */
-+	spinlock_t timer_lock;
-+	/* -- next substream -- */
-+	struct snd_pcm_substream *next;
-+	/* -- linked substreams -- */
-+	struct list_head link_list;	/* linked list member */
-+	struct snd_pcm_group self_group;	/* fake group for non linked substream (with substream lock inside) */
-+	struct snd_pcm_group *group;		/* pointer to current group */
-+	/* -- assigned files -- */
-+	void *file;
-+	int ref_count;
-+	atomic_t mmap_count;
-+	unsigned int f_flags;
-+	void (*pcm_release)(struct snd_pcm_substream *);
-+#if defined(CONFIG_SND_PCM_OSS) || defined(CONFIG_SND_PCM_OSS_MODULE)
-+	/* -- OSS things -- */
-+	struct snd_pcm_oss_substream oss;
-+#endif
-+#ifdef CONFIG_SND_VERBOSE_PROCFS
-+	struct snd_info_entry *proc_root;
-+	struct snd_info_entry *proc_info_entry;
-+	struct snd_info_entry *proc_hw_params_entry;
-+	struct snd_info_entry *proc_sw_params_entry;
-+	struct snd_info_entry *proc_status_entry;
-+	struct snd_info_entry *proc_prealloc_entry;
-+	struct snd_info_entry *proc_prealloc_max_entry;
-+#endif
-+	/* misc flags */
-+	unsigned int hw_opened: 1;
-+};
-+
-+#define SUBSTREAM_BUSY(substream) ((substream)->ref_count > 0)
-+
-+
-+struct snd_pcm_str {
-+	int stream;				/* stream (direction) */
-+	struct snd_pcm *pcm;
-+	/* -- substreams -- */
-+	unsigned int substream_count;
-+	unsigned int substream_opened;
-+	struct snd_pcm_substream *substream;
-+#if defined(CONFIG_SND_PCM_OSS) || defined(CONFIG_SND_PCM_OSS_MODULE)
-+	/* -- OSS things -- */
-+	struct snd_pcm_oss_stream oss;
-+#endif
-+#ifdef CONFIG_SND_VERBOSE_PROCFS
-+	struct snd_info_entry *proc_root;
-+	struct snd_info_entry *proc_info_entry;
-+#ifdef CONFIG_SND_PCM_XRUN_DEBUG
-+	unsigned int xrun_debug;	/* 0 = disabled, 1 = verbose, 2 = stacktrace */
-+	struct snd_info_entry *proc_xrun_debug_entry;
-+#endif
-+#endif
-+};
-+
-+struct snd_pcm {
-+	struct snd_card *card;
-+	struct list_head list;
-+	unsigned int device;	/* device number */
-+	unsigned int info_flags;
-+	unsigned short dev_class;
-+	unsigned short dev_subclass;
-+	char id[64];
-+	char name[80];
-+	struct snd_pcm_str streams[2];
-+	struct mutex open_mutex;
-+	wait_queue_head_t open_wait;
-+	void *private_data;
-+	void (*private_free) (struct snd_pcm *pcm);
-+	struct device *dev; /* actual hw device this belongs to */
-+#if defined(CONFIG_SND_PCM_OSS) || defined(CONFIG_SND_PCM_OSS_MODULE)
-+	struct snd_pcm_oss oss;
-+#endif
-+};
-+
-+struct snd_pcm_notify {
-+	int (*n_register) (struct snd_pcm * pcm);
-+	int (*n_disconnect) (struct snd_pcm * pcm);
-+	int (*n_unregister) (struct snd_pcm * pcm);
-+	struct list_head list;
-+};
-+
-+/*
-+ *  Registering
-+ */
-+
-+extern const struct file_operations snd_pcm_f_ops[2];
-+
-+int snd_pcm_new(struct snd_card *card, char *id, int device,
-+		int playback_count, int capture_count,
-+		struct snd_pcm **rpcm);
-+int snd_pcm_new_stream(struct snd_pcm *pcm, int stream, int substream_count);
-+
-+int snd_pcm_notify(struct snd_pcm_notify *notify, int nfree);
-+
-+/*
-+ *  Native I/O
-+ */
-+
-+extern rwlock_t snd_pcm_link_rwlock;
-+
-+int snd_pcm_info(struct snd_pcm_substream *substream, struct snd_pcm_info *info);
-+int snd_pcm_info_user(struct snd_pcm_substream *substream,
-+		      struct snd_pcm_info __user *info);
-+int snd_pcm_status(struct snd_pcm_substream *substream,
-+		   struct snd_pcm_status *status);
-+int snd_pcm_start(struct snd_pcm_substream *substream);
-+int snd_pcm_stop(struct snd_pcm_substream *substream, int status);
-+int snd_pcm_drain_done(struct snd_pcm_substream *substream);
-+#ifdef CONFIG_PM
-+int snd_pcm_suspend(struct snd_pcm_substream *substream);
-+int snd_pcm_suspend_all(struct snd_pcm *pcm);
-+#endif
-+int snd_pcm_kernel_ioctl(struct snd_pcm_substream *substream, unsigned int cmd, void *arg);
-+int snd_pcm_open_substream(struct snd_pcm *pcm, int stream, struct file *file,
-+			   struct snd_pcm_substream **rsubstream);
-+void snd_pcm_release_substream(struct snd_pcm_substream *substream);
-+int snd_pcm_attach_substream(struct snd_pcm *pcm, int stream, struct file *file,
-+			     struct snd_pcm_substream **rsubstream);
-+void snd_pcm_detach_substream(struct snd_pcm_substream *substream);
-+void snd_pcm_vma_notify_data(void *client, void *data);
-+int snd_pcm_mmap_data(struct snd_pcm_substream *substream, struct file *file, struct vm_area_struct *area);
-+
-+#if BITS_PER_LONG >= 64
-+
-+static inline void div64_32(u_int64_t *n, u_int32_t div, u_int32_t *rem)
-+{
-+	*rem = *n % div;
-+	*n /= div;
-+}
-+
-+#elif defined(i386)
-+
-+static inline void div64_32(u_int64_t *n, u_int32_t div, u_int32_t *rem)
-+{
-+	u_int32_t low, high;
-+	low = *n & 0xffffffff;
-+	high = *n >> 32;
-+	if (high) {
-+		u_int32_t high1 = high % div;
-+		high /= div;
-+		asm("divl %2":"=a" (low), "=d" (*rem):"rm" (div), "a" (low), "d" (high1));
-+		*n = (u_int64_t)high << 32 | low;
-+	} else {
-+		*n = low / div;
-+		*rem = low % div;
-+	}
-+}
-+#else
-+
-+static inline void divl(u_int32_t high, u_int32_t low,
-+			u_int32_t div,
-+			u_int32_t *q, u_int32_t *r)
-+{
-+	u_int64_t n = (u_int64_t)high << 32 | low;
-+	u_int64_t d = (u_int64_t)div << 31;
-+	u_int32_t q1 = 0;
-+	int c = 32;
-+	while (n > 0xffffffffU) {
-+		q1 <<= 1;
-+		if (n >= d) {
-+			n -= d;
-+			q1 |= 1;
-+		}
-+		d >>= 1;
-+		c--;
-+	}
-+	q1 <<= c;
-+	if (n) {
-+		low = n;
-+		*q = q1 | (low / div);
-+		*r = low % div;
-+	} else {
-+		*r = 0;
-+		*q = q1;
-+	}
-+	return;
-+}
-+
-+static inline void div64_32(u_int64_t *n, u_int32_t div, u_int32_t *rem)
-+{
-+	u_int32_t low, high;
-+	low = *n & 0xffffffff;
-+	high = *n >> 32;
-+	if (high) {
-+		u_int32_t high1 = high % div;
-+		u_int32_t low1 = low;
-+		high /= div;
-+		divl(high1, low1, div, &low, rem);
-+		*n = (u_int64_t)high << 32 | low;
-+	} else {
-+		*n = low / div;
-+		*rem = low % div;
-+	}
-+}
-+#endif
-+
-+/*
-+ *  PCM library
-+ */
-+
-+static inline int snd_pcm_stream_linked(struct snd_pcm_substream *substream)
-+{
-+	return substream->group != &substream->self_group;
-+}
-+
-+static inline void snd_pcm_stream_lock(struct snd_pcm_substream *substream)
-+{
-+	read_lock(&snd_pcm_link_rwlock);
-+	spin_lock(&substream->self_group.lock);
-+}
-+
-+static inline void snd_pcm_stream_unlock(struct snd_pcm_substream *substream)
-+{
-+	spin_unlock(&substream->self_group.lock);
-+	read_unlock(&snd_pcm_link_rwlock);
-+}
-+
-+static inline void snd_pcm_stream_lock_irq(struct snd_pcm_substream *substream)
-+{
-+	read_lock_irq(&snd_pcm_link_rwlock);
-+	spin_lock(&substream->self_group.lock);
-+}
-+
-+static inline void snd_pcm_stream_unlock_irq(struct snd_pcm_substream *substream)
-+{
-+	spin_unlock(&substream->self_group.lock);
-+	read_unlock_irq(&snd_pcm_link_rwlock);
-+}
-+
-+#define snd_pcm_stream_lock_irqsave(substream, flags) \
-+do { \
-+	read_lock_irqsave(&snd_pcm_link_rwlock, (flags)); \
-+	spin_lock(&substream->self_group.lock); \
-+} while (0)
-+
-+#define snd_pcm_stream_unlock_irqrestore(substream, flags) \
-+do { \
-+	spin_unlock(&substream->self_group.lock); \
-+	read_unlock_irqrestore(&snd_pcm_link_rwlock, (flags)); \
-+} while (0)
-+
-+#define snd_pcm_group_for_each_entry(s, substream) \
-+	list_for_each_entry(s, &substream->group->substreams, link_list)
-+
-+static inline int snd_pcm_running(struct snd_pcm_substream *substream)
-+{
-+	return (substream->runtime->status->state == SNDRV_PCM_STATE_RUNNING ||
-+		(substream->runtime->status->state == SNDRV_PCM_STATE_DRAINING &&
-+		 substream->stream == SNDRV_PCM_STREAM_PLAYBACK));
-+}
-+
-+static inline ssize_t bytes_to_samples(struct snd_pcm_runtime *runtime, ssize_t size)
-+{
-+	return size * 8 / runtime->sample_bits;
-+}
-+
-+static inline snd_pcm_sframes_t bytes_to_frames(struct snd_pcm_runtime *runtime, ssize_t size)
-+{
-+	return size * 8 / runtime->frame_bits;
-+}
-+
-+static inline ssize_t samples_to_bytes(struct snd_pcm_runtime *runtime, ssize_t size)
-+{
-+	return size * runtime->sample_bits / 8;
-+}
-+
-+static inline ssize_t frames_to_bytes(struct snd_pcm_runtime *runtime, snd_pcm_sframes_t size)
-+{
-+	return size * runtime->frame_bits / 8;
-+}
-+
-+static inline int frame_aligned(struct snd_pcm_runtime *runtime, ssize_t bytes)
-+{
-+	return bytes % runtime->byte_align == 0;
-+}
-+
-+static inline size_t snd_pcm_lib_buffer_bytes(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return frames_to_bytes(runtime, runtime->buffer_size);
-+}
-+
-+static inline size_t snd_pcm_lib_period_bytes(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return frames_to_bytes(runtime, runtime->period_size);
-+}
-+
-+/*
-+ *  result is: 0 ... (boundary - 1)
-+ */
-+static inline snd_pcm_uframes_t snd_pcm_playback_avail(struct snd_pcm_runtime *runtime)
-+{
-+	snd_pcm_sframes_t avail = runtime->status->hw_ptr + runtime->buffer_size - runtime->control->appl_ptr;
-+	if (avail < 0)
-+		avail += runtime->boundary;
-+	else if ((snd_pcm_uframes_t) avail >= runtime->boundary)
-+		avail -= runtime->boundary;
-+	return avail;
-+}
-+
-+/*
-+ *  result is: 0 ... (boundary - 1)
-+ */
-+static inline snd_pcm_uframes_t snd_pcm_capture_avail(struct snd_pcm_runtime *runtime)
-+{
-+	snd_pcm_sframes_t avail = runtime->status->hw_ptr - runtime->control->appl_ptr;
-+	if (avail < 0)
-+		avail += runtime->boundary;
-+	return avail;
-+}
-+
-+static inline snd_pcm_sframes_t snd_pcm_playback_hw_avail(struct snd_pcm_runtime *runtime)
-+{
-+	return runtime->buffer_size - snd_pcm_playback_avail(runtime);
-+}
-+
-+static inline snd_pcm_sframes_t snd_pcm_capture_hw_avail(struct snd_pcm_runtime *runtime)
-+{
-+	return runtime->buffer_size - snd_pcm_capture_avail(runtime);
-+}
-+
-+/**
-+ * snd_pcm_playback_ready - check whether the playback buffer is available
-+ * @substream: the pcm substream instance
-+ *
-+ * Checks whether enough free space is available on the playback buffer.
-+ *
-+ * Returns non-zero if available, or zero if not.
-+ */
-+static inline int snd_pcm_playback_ready(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return snd_pcm_playback_avail(runtime) >= runtime->control->avail_min;
-+}
-+
-+/**
-+ * snd_pcm_capture_ready - check whether the capture buffer is available
-+ * @substream: the pcm substream instance
-+ *
-+ * Checks whether enough capture data is available on the capture buffer.
-+ *
-+ * Returns non-zero if available, or zero if not.
-+ */
-+static inline int snd_pcm_capture_ready(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return snd_pcm_capture_avail(runtime) >= runtime->control->avail_min;
-+}
-+
-+/**
-+ * snd_pcm_playback_data - check whether any data exists on the playback buffer
-+ * @substream: the pcm substream instance
-+ *
-+ * Checks whether any data exists on the playback buffer. If stop_threshold
-+ * is bigger or equal to boundary, then this function returns always non-zero.
-+ *
-+ * Returns non-zero if exists, or zero if not.
-+ */
-+static inline int snd_pcm_playback_data(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	
-+	if (runtime->stop_threshold >= runtime->boundary)
-+		return 1;
-+	return snd_pcm_playback_avail(runtime) < runtime->buffer_size;
-+}
-+
-+/**
-+ * snd_pcm_playback_empty - check whether the playback buffer is empty
-+ * @substream: the pcm substream instance
-+ *
-+ * Checks whether the playback buffer is empty.
-+ *
-+ * Returns non-zero if empty, or zero if not.
-+ */
-+static inline int snd_pcm_playback_empty(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return snd_pcm_playback_avail(runtime) >= runtime->buffer_size;
-+}
-+
-+/**
-+ * snd_pcm_capture_empty - check whether the capture buffer is empty
-+ * @substream: the pcm substream instance
-+ *
-+ * Checks whether the capture buffer is empty.
-+ *
-+ * Returns non-zero if empty, or zero if not.
-+ */
-+static inline int snd_pcm_capture_empty(struct snd_pcm_substream *substream)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	return snd_pcm_capture_avail(runtime) == 0;
-+}
-+
-+static inline void snd_pcm_trigger_done(struct snd_pcm_substream *substream, 
-+					struct snd_pcm_substream *master)
-+{
-+	substream->runtime->trigger_master = master;
-+}
-+
-+static inline int hw_is_mask(int var)
-+{
-+	return var >= SNDRV_PCM_HW_PARAM_FIRST_MASK &&
-+		var <= SNDRV_PCM_HW_PARAM_LAST_MASK;
-+}
-+
-+static inline int hw_is_interval(int var)
-+{
-+	return var >= SNDRV_PCM_HW_PARAM_FIRST_INTERVAL &&
-+		var <= SNDRV_PCM_HW_PARAM_LAST_INTERVAL;
-+}
-+
-+static inline struct snd_mask *hw_param_mask(struct snd_pcm_hw_params *params,
-+				     snd_pcm_hw_param_t var)
-+{
-+	return &params->masks[var - SNDRV_PCM_HW_PARAM_FIRST_MASK];
-+}
-+
-+static inline struct snd_interval *hw_param_interval(struct snd_pcm_hw_params *params,
-+					     snd_pcm_hw_param_t var)
-+{
-+	return &params->intervals[var - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
-+}
-+
-+static inline const struct snd_mask *hw_param_mask_c(const struct snd_pcm_hw_params *params,
-+					     snd_pcm_hw_param_t var)
-+{
-+	return &params->masks[var - SNDRV_PCM_HW_PARAM_FIRST_MASK];
-+}
-+
-+static inline const struct snd_interval *hw_param_interval_c(const struct snd_pcm_hw_params *params,
-+						     snd_pcm_hw_param_t var)
-+{
-+	return &params->intervals[var - SNDRV_PCM_HW_PARAM_FIRST_INTERVAL];
-+}
-+
-+#define params_access(p) snd_mask_min(hw_param_mask((p), SNDRV_PCM_HW_PARAM_ACCESS))
-+#define params_format(p) snd_mask_min(hw_param_mask((p), SNDRV_PCM_HW_PARAM_FORMAT))
-+#define params_subformat(p) snd_mask_min(hw_param_mask((p), SNDRV_PCM_HW_PARAM_SUBFORMAT))
-+#define params_channels(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_CHANNELS)->min
-+#define params_rate(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_RATE)->min
-+#define params_period_size(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_PERIOD_SIZE)->min
-+#define params_period_bytes(p) ((params_period_size(p)*snd_pcm_format_physical_width(params_format(p))*params_channels(p))/8)
-+#define params_periods(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_PERIODS)->min
-+#define params_buffer_size(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_BUFFER_SIZE)->min
-+#define params_buffer_bytes(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_BUFFER_BYTES)->min
-+#define params_tick_time(p) hw_param_interval((p), SNDRV_PCM_HW_PARAM_TICK_TIME)->min
-+
-+
-+int snd_interval_refine(struct snd_interval *i, const struct snd_interval *v);
-+void snd_interval_mul(const struct snd_interval *a, const struct snd_interval *b, struct snd_interval *c);
-+void snd_interval_div(const struct snd_interval *a, const struct snd_interval *b, struct snd_interval *c);
-+void snd_interval_muldivk(const struct snd_interval *a, const struct snd_interval *b, 
-+			  unsigned int k, struct snd_interval *c);
-+void snd_interval_mulkdiv(const struct snd_interval *a, unsigned int k,
-+			  const struct snd_interval *b, struct snd_interval *c);
-+int snd_interval_list(struct snd_interval *i, unsigned int count, unsigned int *list, unsigned int mask);
-+int snd_interval_ratnum(struct snd_interval *i,
-+			unsigned int rats_count, struct snd_ratnum *rats,
-+			unsigned int *nump, unsigned int *denp);
-+
-+void _snd_pcm_hw_params_any(struct snd_pcm_hw_params *params);
-+void _snd_pcm_hw_param_setempty(struct snd_pcm_hw_params *params, snd_pcm_hw_param_t var);
-+int snd_pcm_hw_params_choose(struct snd_pcm_substream *substream, struct snd_pcm_hw_params *params);
-+
-+int snd_pcm_hw_refine(struct snd_pcm_substream *substream, struct snd_pcm_hw_params *params);
-+
-+int snd_pcm_hw_constraints_init(struct snd_pcm_substream *substream);
-+int snd_pcm_hw_constraints_complete(struct snd_pcm_substream *substream);
-+
-+int snd_pcm_hw_constraint_mask(struct snd_pcm_runtime *runtime, snd_pcm_hw_param_t var,
-+			       u_int32_t mask);
-+int snd_pcm_hw_constraint_mask64(struct snd_pcm_runtime *runtime, snd_pcm_hw_param_t var,
-+				 u_int64_t mask);
-+int snd_pcm_hw_constraint_minmax(struct snd_pcm_runtime *runtime, snd_pcm_hw_param_t var,
-+				 unsigned int min, unsigned int max);
-+int snd_pcm_hw_constraint_integer(struct snd_pcm_runtime *runtime, snd_pcm_hw_param_t var);
-+int snd_pcm_hw_constraint_list(struct snd_pcm_runtime *runtime, 
-+			       unsigned int cond,
-+			       snd_pcm_hw_param_t var,
-+			       struct snd_pcm_hw_constraint_list *l);
-+int snd_pcm_hw_constraint_ratnums(struct snd_pcm_runtime *runtime, 
-+				  unsigned int cond,
-+				  snd_pcm_hw_param_t var,
-+				  struct snd_pcm_hw_constraint_ratnums *r);
-+int snd_pcm_hw_constraint_ratdens(struct snd_pcm_runtime *runtime, 
-+				  unsigned int cond,
-+				  snd_pcm_hw_param_t var,
-+				  struct snd_pcm_hw_constraint_ratdens *r);
-+int snd_pcm_hw_constraint_msbits(struct snd_pcm_runtime *runtime, 
-+				 unsigned int cond,
-+				 unsigned int width,
-+				 unsigned int msbits);
-+int snd_pcm_hw_constraint_step(struct snd_pcm_runtime *runtime,
-+			       unsigned int cond,
-+			       snd_pcm_hw_param_t var,
-+			       unsigned long step);
-+int snd_pcm_hw_constraint_pow2(struct snd_pcm_runtime *runtime,
-+			       unsigned int cond,
-+			       snd_pcm_hw_param_t var);
-+int snd_pcm_hw_rule_add(struct snd_pcm_runtime *runtime,
-+			unsigned int cond,
-+			int var,
-+			snd_pcm_hw_rule_func_t func, void *private,
-+			int dep, ...);
-+
-+int snd_pcm_format_signed(snd_pcm_format_t format);
-+int snd_pcm_format_unsigned(snd_pcm_format_t format);
-+int snd_pcm_format_linear(snd_pcm_format_t format);
-+int snd_pcm_format_little_endian(snd_pcm_format_t format);
-+int snd_pcm_format_big_endian(snd_pcm_format_t format);
-+#if 0 /* just for DocBook */
-+/**
-+ * snd_pcm_format_cpu_endian - Check the PCM format is CPU-endian
-+ * @format: the format to check
-+ *
-+ * Returns 1 if the given PCM format is CPU-endian, 0 if
-+ * opposite, or a negative error code if endian not specified.
-+ */
-+int snd_pcm_format_cpu_endian(snd_pcm_format_t format);
-+#endif /* DocBook */
-+#ifdef SNDRV_LITTLE_ENDIAN
-+#define snd_pcm_format_cpu_endian(format) snd_pcm_format_little_endian(format)
-+#else
-+#define snd_pcm_format_cpu_endian(format) snd_pcm_format_big_endian(format)
-+#endif
-+int snd_pcm_format_width(snd_pcm_format_t format);			/* in bits */
-+int snd_pcm_format_physical_width(snd_pcm_format_t format);		/* in bits */
-+ssize_t snd_pcm_format_size(snd_pcm_format_t format, size_t samples);
-+const unsigned char *snd_pcm_format_silence_64(snd_pcm_format_t format);
-+int snd_pcm_format_set_silence(snd_pcm_format_t format, void *buf, unsigned int frames);
-+snd_pcm_format_t snd_pcm_build_linear_format(int width, int unsignd, int big_endian);
-+
-+void snd_pcm_set_ops(struct snd_pcm * pcm, int direction, struct snd_pcm_ops *ops);
-+void snd_pcm_set_sync(struct snd_pcm_substream *substream);
-+int snd_pcm_lib_interleave_len(struct snd_pcm_substream *substream);
-+int snd_pcm_lib_ioctl(struct snd_pcm_substream *substream,
-+		      unsigned int cmd, void *arg);                      
-+int snd_pcm_update_hw_ptr(struct snd_pcm_substream *substream);
-+int snd_pcm_playback_xrun_check(struct snd_pcm_substream *substream);
-+int snd_pcm_capture_xrun_check(struct snd_pcm_substream *substream);
-+int snd_pcm_playback_xrun_asap(struct snd_pcm_substream *substream);
-+int snd_pcm_capture_xrun_asap(struct snd_pcm_substream *substream);
-+void snd_pcm_playback_silence(struct snd_pcm_substream *substream, snd_pcm_uframes_t new_hw_ptr);
-+void snd_pcm_tick_prepare(struct snd_pcm_substream *substream);
-+void snd_pcm_tick_set(struct snd_pcm_substream *substream, unsigned long ticks);
-+void snd_pcm_tick_elapsed(struct snd_pcm_substream *substream);
-+void snd_pcm_period_elapsed(struct snd_pcm_substream *substream);
-+snd_pcm_sframes_t snd_pcm_lib_write(struct snd_pcm_substream *substream,
-+				    const void __user *buf,
-+				    snd_pcm_uframes_t frames);
-+snd_pcm_sframes_t snd_pcm_lib_read(struct snd_pcm_substream *substream,
-+				   void __user *buf, snd_pcm_uframes_t frames);
-+snd_pcm_sframes_t snd_pcm_lib_writev(struct snd_pcm_substream *substream,
-+				     void __user **bufs, snd_pcm_uframes_t frames);
-+snd_pcm_sframes_t snd_pcm_lib_readv(struct snd_pcm_substream *substream,
-+				    void __user **bufs, snd_pcm_uframes_t frames);
-+
-+extern const struct snd_pcm_hw_constraint_list snd_pcm_known_rates;
-+
-+int snd_pcm_limit_hw_rates(struct snd_pcm_runtime *runtime);
-+unsigned int snd_pcm_rate_to_rate_bit(unsigned int rate);
-+
-+static inline void snd_pcm_set_runtime_buffer(struct snd_pcm_substream *substream,
-+					      struct snd_dma_buffer *bufp)
-+{
-+	struct snd_pcm_runtime *runtime = substream->runtime;
-+	if (bufp) {
-+		runtime->dma_buffer_p = bufp;
-+		runtime->dma_area = bufp->area;
-+		runtime->dma_addr = bufp->addr;
-+		runtime->dma_bytes = bufp->bytes;
-+	} else {
-+		runtime->dma_buffer_p = NULL;
-+		runtime->dma_area = NULL;
-+		runtime->dma_addr = 0;
-+		runtime->dma_bytes = 0;
-+	}
-+}
-+
-+/*
-+ *  Timer interface
-+ */
-+
-+void snd_pcm_timer_resolution_change(struct snd_pcm_substream *substream);
-+void snd_pcm_timer_init(struct snd_pcm_substream *substream);
-+void snd_pcm_timer_done(struct snd_pcm_substream *substream);
-+
-+/*
-+ *  Memory
-+ */
-+
-+int snd_pcm_lib_preallocate_free(struct snd_pcm_substream *substream);
-+int snd_pcm_lib_preallocate_free_for_all(struct snd_pcm *pcm);
-+int snd_pcm_lib_preallocate_pages(struct snd_pcm_substream *substream,
-+				  int type, struct device *data,
-+				  size_t size, size_t max);
-+int snd_pcm_lib_preallocate_pages_for_all(struct snd_pcm *pcm,
-+					  int type, void *data,
-+					  size_t size, size_t max);
-+int snd_pcm_lib_malloc_pages(struct snd_pcm_substream *substream, size_t size);
-+int snd_pcm_lib_free_pages(struct snd_pcm_substream *substream);
-+
-+#define snd_pcm_substream_sgbuf(substream) ((substream)->runtime->dma_buffer_p->private_data)
-+#define snd_pcm_sgbuf_pages(size) snd_sgbuf_aligned_pages(size)
-+#define snd_pcm_sgbuf_get_addr(sgbuf,ofs) snd_sgbuf_get_addr(sgbuf,ofs)
-+struct page *snd_pcm_sgbuf_ops_page(struct snd_pcm_substream *substream, unsigned long offset);
-+
-+/* handle mmap counter - PCM mmap callback should handle this counter properly */
-+static inline void snd_pcm_mmap_data_open(struct vm_area_struct *area)
-+{
-+	struct snd_pcm_substream *substream = (struct snd_pcm_substream *)area->vm_private_data;
-+	atomic_inc(&substream->mmap_count);
-+}
-+
-+static inline void snd_pcm_mmap_data_close(struct vm_area_struct *area)
-+{
-+	struct snd_pcm_substream *substream = (struct snd_pcm_substream *)area->vm_private_data;
-+	atomic_dec(&substream->mmap_count);
-+}
-+
-+/* mmap for io-memory area */
-+#if defined(CONFIG_X86) || defined(CONFIG_PPC) || defined(CONFIG_ALPHA)
-+#define SNDRV_PCM_INFO_MMAP_IOMEM	SNDRV_PCM_INFO_MMAP
-+int snd_pcm_lib_mmap_iomem(struct snd_pcm_substream *substream, struct vm_area_struct *area);
-+#else
-+#define SNDRV_PCM_INFO_MMAP_IOMEM	0
-+#define snd_pcm_lib_mmap_iomem	NULL
-+#endif
-+
-+static inline void snd_pcm_limit_isa_dma_size(int dma, size_t *max)
-+{
-+	*max = dma < 4 ? 64 * 1024 : 128 * 1024;
-+}
-+
-+/*
-+ *  Misc
-+ */
-+
-+#define SNDRV_PCM_DEFAULT_CON_SPDIF	(IEC958_AES0_CON_EMPHASIS_NONE|\
-+					 (IEC958_AES1_CON_ORIGINAL<<8)|\
-+					 (IEC958_AES1_CON_PCM_CODER<<8)|\
-+					 (IEC958_AES3_CON_FS_48000<<24))
-+
-+#endif /* __SOUND_PCM_H */
