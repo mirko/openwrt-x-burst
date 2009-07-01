@@ -3,7 +3,7 @@
 @@ -16,6 +16,82 @@
  	prompt "System type"
  	default SGI_IP22
- 
+
 +config JZ4730_PMP
 +	bool "Ingenic JZ4730 PMP board"
 +	select DMA_NONCOHERENT
@@ -82,11 +82,11 @@
 +
  config MACH_ALCHEMY
  	bool "Alchemy processor based machines"
- 
+
 @@ -701,6 +777,48 @@
- 
+
  endmenu
- 
+
 +#####################################################
 +# Ingenic SOC series
 +#####################################################
@@ -133,9 +133,9 @@
  	bool
  	default y
 @@ -1770,6 +1888,14 @@
- 
+
  source "kernel/time/Kconfig"
- 
+
 +# the value of (max order + 1)
 +config FORCE_MAX_ZONEORDER
 +	prompt "MAX_ZONEORDER"
@@ -148,9 +148,9 @@
  # Timer Interrupt Frequency Configuration
  #
 @@ -2046,6 +2172,23 @@
- 
+
  endmenu
- 
+
 +menu "CPU Frequency scaling"
 +
 +config CPU_FREQ_JZ
@@ -169,13 +169,13 @@
 +endmenu
 +
  menu "Power management options"
- 
+
  source "kernel/power/Kconfig"
 --- linux-2.6.24.7.old/arch/mips/Makefile	2009-04-12 18:05:07.000000000 +0200
 +++ linux-2.6.24.7/arch/mips/Makefile	2009-04-12 18:13:57.000000000 +0200
 @@ -159,6 +159,37 @@
  #
- 
+
  #
 +# Commond Ingenic JZ4730 series
 +#
@@ -212,9 +212,9 @@
  #
  core-$(CONFIG_MACH_JAZZ)	+= arch/mips/jazz/
 @@ -673,6 +704,12 @@
- 
+
  all:	$(all-y)
- 
+
 +uImage: $(vmlinux-32)
 +	+@$(call makeboot,$@)
 +
@@ -223,14 +223,14 @@
 +
  vmlinux.bin: $(vmlinux-32)
  	+@$(call makeboot,$@)
- 
+
 @@ -697,12 +734,13 @@
- 
+
  archclean:
  	@$(MAKE) $(clean)=arch/mips/boot
 +	@$(MAKE) $(clean)=arch/mips/boot/compressed
  	@$(MAKE) $(clean)=arch/mips/lasat
- 
+
  define archhelp
 -	echo '  vmlinux.ecoff        - ECOFF boot image'
 -	echo '  vmlinux.bin          - Raw binary boot image'
@@ -961,7 +961,7 @@
 @@ -7,6 +7,9 @@
  # Copyright (C) 2004  Maciej W. Rozycki
  #
- 
+
 +# This one must match the LOADADDR in arch/mips/Makefile!
 +LOADADDR=0x80010000
 +
@@ -969,18 +969,18 @@
  # Some DECstations need all possible sections of an ECOFF executable
  #
 @@ -25,7 +28,7 @@
- 
+
  VMLINUX = vmlinux
- 
+
 -all: vmlinux.ecoff vmlinux.srec addinitrd
 +all: vmlinux.ecoff vmlinux.srec addinitrd uImage zImage
- 
+
  vmlinux.ecoff: $(obj)/elf2ecoff $(VMLINUX)
  	$(obj)/elf2ecoff $(VMLINUX) vmlinux.ecoff $(E2EFLAGS)
 @@ -42,8 +45,24 @@
  $(obj)/addinitrd: $(obj)/addinitrd.c
  	$(HOSTCC) -o $@ $^
- 
+
 +uImage: $(VMLINUX) vmlinux.bin
 +	rm -f $(obj)/vmlinux.bin.gz
 +	gzip -9 $(obj)/vmlinux.bin
@@ -1047,7 +1047,7 @@
 +	$(OBJCOPY) $(OBJCOPY_ARGS) $@ $@ -R .comment -R .stab -R .stabstr -R .initrd -R .sysmap
 +
 +zImage: $(obj)/vmlinuz
-+	$(OBJCOPY) -O binary $(obj)/vmlinuz $(obj)/zImage	
++	$(OBJCOPY) -O binary $(obj)/vmlinuz $(obj)/zImage
 --- linux-2.6.24.7.old/arch/mips/boot/compressed/dummy.c	1970-01-01 01:00:00.000000000 +0100
 +++ linux-2.6.24.7/arch/mips/boot/compressed/dummy.c	2009-04-12 18:13:57.000000000 +0200
 @@ -0,0 +1,4 @@
@@ -1350,7 +1350,7 @@
 +#define RESERVED     0xC0 /* bit 6,7:   reserved */
 +
 +#define get_byte()  (inptr < insize ? inbuf[inptr++] : fill_inbuf())
-+		
++
 +/* Diagnostic functions */
 +#ifdef DEBUG
 +#  define Assert(cond,msg) {if(!(cond)) error(msg);}
@@ -1386,7 +1386,7 @@
 +static uch *output_data;
 +static unsigned long output_ptr = 0;
 +
-+ 
++
 +static void *malloc(int size);
 +static void free(void *where);
 +static void error(char *m);
@@ -1400,7 +1400,7 @@
 +extern unsigned char _end[];
 +static unsigned long free_mem_ptr;
 +static unsigned long free_mem_end_ptr;
-+ 
++
 +#define HEAP_SIZE             0x10000
 +
 +#include "../../../../lib/inflate.c"
@@ -1505,9 +1505,9 @@
 +    ulg c = crc;         /* temporary variable */
 +    unsigned n;
 +    uch *in, *out, ch;
-+    
++
 +    in = window;
-+    out = &output_data[output_ptr]; 
++    out = &output_data[output_ptr];
 +    for (n = 0; n < outcnt; n++) {
 +	    ch = *out++ = *in++;
 +	    c = crc_32_tab[((int)c ^ ch) & 0xff] ^ (c >> 8);
@@ -12077,7 +12077,7 @@
 +# Object file lists.
 +
 +obj-y += prom.o irq.o time.o reset.o setup.o dma.o \
-+	platform.o i2c.o 
++	platform.o i2c.o
 +
 +obj-$(CONFIG_PROC_FS)		+= proc.o
 +
@@ -12211,7 +12211,7 @@
 +/*
 + * linux/arch/mips/jz4730/cpufreq.c
 + *
-+ * cpufreq driver for JZ4730 
++ * cpufreq driver for JZ4730
 + *
 + * Copyright (c) 2006-2007  Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
@@ -12286,7 +12286,7 @@
 +
 +static void jz_update_clocks(void)
 +{
-+	/* Next clocks must be updated if we have changed 
++	/* Next clocks must be updated if we have changed
 +	 * the PLL or divisors.
 +	 */
 +	jz_clocks.iclk = __cpm_get_iclk();
@@ -12311,7 +12311,7 @@
 +		/* the first time to scale frequencies */
 +		unsigned int dmcr, rtcor;
 +		unsigned int tras, rcd, tpc, trwl, trc;
-+		
++
 +		dmcr = REG_EMC_DMCR;
 +		rtcor = REG_EMC_RTCOR;
 +
@@ -12336,7 +12336,7 @@
 +static void jz_update_dram_rtcor(unsigned int new_mclk)
 +{
 +	unsigned int rtcor;
-+	
++
 +	new_mclk /= 1000;
 +	rtcor = boot_config.rtcor * new_mclk / boot_config.mclk;
 +	rtcor--;
@@ -12400,10 +12400,10 @@
 +
 +	trc = (trc < 1) ? 1: trc;
 +	trc = (trc > 15) ? 15: trc;
-+	trc /= 2;	
++	trc /= 2;
 +
 +	dmcr = REG_EMC_DMCR;
-+	
++
 +	dmcr &= ~(EMC_DMCR_TRAS_MASK | EMC_DMCR_RCD_MASK | EMC_DMCR_TPC_MASK | EMC_DMCR_TRWL_MASK | EMC_DMCR_TRC_MASK);
 +	dmcr |= ((tras << EMC_DMCR_TRAS_BIT) | (rcd << EMC_DMCR_RCD_BIT) | (tpc << EMC_DMCR_TPC_BIT) | (trwl << EMC_DMCR_TRWL_BIT) | (trc << EMC_DMCR_TRC_BIT));
 +
@@ -12411,7 +12411,7 @@
 +}
 +
 +static void jz_update_dram_prev(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so first update TRAS, RCD, TPC, TRWL
@@ -12427,11 +12427,11 @@
 +}
 +
 +static void jz_update_dram_post(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so update RTCOR
-+		 * after changing the frequency 
++		 * after changing the frequency
 +		 */
 +		jz_update_dram_rtcor(new_mclk);
 +	} else {
@@ -12447,13 +12447,13 @@
 +	unsigned int cfcr;
 +	unsigned int cur_mclk, new_mclk;
 +	int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	cfcr = REG_CPM_CFCR;
 +	cfcr &= ~((unsigned long)regs->cfcr_mask);
 +	cfcr |= regs->cfcr;
 +	cfcr |= CPM_CFCR_UPE;       /* update immediately */
-+	
++
 +	cur_mclk = __cpm_get_mclk();
 +	new_mclk = __cpm_get_pllout() / div[(cfcr & CPM_CFCR_MFR_MASK) >> CPM_CFCR_MFR_BIT];
 +
@@ -12486,10 +12486,10 @@
 +#ifdef CHANGE_PLL
 +/* Maintain the LCD clock and pixel clock */
 +static void jz_scale_lcd_divisors(struct dpm_regs *regs)
-+{	
++{
 +	unsigned int new_pll, new_lcd_div, new_lcdpix_div;
 +	unsigned int cfcr;
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	if (!boot_config.lcd_clks_initialized) return;
 +
@@ -12556,7 +12556,7 @@
 +	 */
 +	jz_update_dram_prev(cur_mclk, new_mclk);
 +
-+	/* 
++	/*
 +	 * Update PLL, align code to cache line.
 +	 */
 +	plcr1 |= CPM_PLCR1_PLL1EN;
@@ -12588,9 +12588,9 @@
 +	jz_init_boot_config();
 +
 +#ifdef CHANGE_PLL
-+	/* 
++	/*
 +	 * Disable LCD before scaling pll.
-+	 * LCD and LCD pixel clocks should not be changed even if the PLL 
++	 * LCD and LCD pixel clocks should not be changed even if the PLL
 +	 * output frequency has been changed.
 +	 */
 +	REG_LCD_CTRL &= ~LCD_CTRL_ENA;
@@ -12688,8 +12688,8 @@
 +
 +	dprintk("divisors of I:S:P:M = %d:%d:%d:%d\n", div[0], div[1], div[2], div[3]);
 +
-+	regs->cfcr = (n2FR[div[0]] << CPM_CFCR_IFR_BIT) | 
-+		(n2FR[div[1]] << CPM_CFCR_SFR_BIT) | 
++	regs->cfcr = (n2FR[div[0]] << CPM_CFCR_IFR_BIT) |
++		(n2FR[div[1]] << CPM_CFCR_SFR_BIT) |
 +		(n2FR[div[2]] << CPM_CFCR_PFR_BIT) |
 +		(n2FR[div[3]] << CPM_CFCR_MFR_BIT);
 +
@@ -13211,7 +13211,7 @@
 +			chan->mode &= ~DMAC_DCCSR_DAM;
 +		} else
 +			printk("jz_set_oss_dma() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCCSR(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -13247,7 +13247,7 @@
 +			chan->mode &= ~DMAC_DCCSR_DAM;
 +		} else
 +			printk("jz_set_alsa_dma() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCCSR(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -13746,7 +13746,7 @@
 +		disable_intc_irq(i);
 +		irq_desc[i].chip = &intc_irq_type;
 +	}
-+	
++
 +	/* Set up DMAC irq
 +	 */
 +	for (i = 0; i < NUM_DMA; i++) {
@@ -13965,7 +13965,7 @@
 +#include <linux/pm.h>
 +#include <linux/pm_legacy.h>
 +#include <linux/sched.h>
-+#include <linux/proc_fs.h>   
++#include <linux/proc_fs.h>
 +#include <linux/sysctl.h>
 +
 +#include <asm/cacheops.h>
@@ -13981,7 +13981,7 @@
 +
 +/*
 + * List of global jz4730 peripheral registers to preserve.
-+ * More ones like core register and general purpose register values 
++ * More ones like core register and general purpose register values
 + * are preserved with the stack pointer in sleep.S.
 + */
 +enum {	SLEEP_SAVE_START = 0,
@@ -14033,7 +14033,7 @@
 +	SLEEP_SAVE_DMAC_DCCSR0, SLEEP_SAVE_DMAC_DCCSR1, SLEEP_SAVE_DMAC_DCCSR2, SLEEP_SAVE_DMAC_DCCSR3, SLEEP_SAVE_DMAC_DCCSR4, SLEEP_SAVE_DMAC_DCCSR5, SLEEP_SAVE_DMAC_DCCSR6, SLEEP_SAVE_DMAC_DCCSR7,
 +
 +	/* INTC */
-+	SLEEP_SAVE_INTC_IPR, SLEEP_SAVE_INTC_ISR, SLEEP_SAVE_INTC_IMR, 
++	SLEEP_SAVE_INTC_IPR, SLEEP_SAVE_INTC_ISR, SLEEP_SAVE_INTC_IMR,
 +
 +	/* Checksum */
 +	SLEEP_SAVE_CKSUM,
@@ -14102,37 +14102,37 @@
 +
 +	SAVE(HARB_HAPOR, 32); SAVE(HARB_HMCTR, 32); SAVE(HARB_HMLTR, 32);
 +
-+	SAVE(EMC_SMCR0, 32); SAVE(EMC_SMCR1, 32); SAVE(EMC_SMCR2, 32); SAVE(EMC_SMCR3, 32); 
++	SAVE(EMC_SMCR0, 32); SAVE(EMC_SMCR1, 32); SAVE(EMC_SMCR2, 32); SAVE(EMC_SMCR3, 32);
 +	SAVE(EMC_SMCR4, 32); SAVE(EMC_SMCR5, 32);
 +
-+	SAVE(GPIO_GPDR0, 32); SAVE(GPIO_GPDR1, 32); SAVE(GPIO_GPDR2, 32); 
++	SAVE(GPIO_GPDR0, 32); SAVE(GPIO_GPDR1, 32); SAVE(GPIO_GPDR2, 32);
 +	SAVE(GPIO_GPDR3, 32);
-+	SAVE(GPIO_GPDIR0, 32); SAVE(GPIO_GPDIR1, 32); SAVE(GPIO_GPDIR2, 32); 
++	SAVE(GPIO_GPDIR0, 32); SAVE(GPIO_GPDIR1, 32); SAVE(GPIO_GPDIR2, 32);
 +	SAVE(GPIO_GPDIR3, 32);
-+	SAVE(GPIO_GPODR0, 32); SAVE(GPIO_GPODR1, 32); SAVE(GPIO_GPODR2, 32); 
++	SAVE(GPIO_GPODR0, 32); SAVE(GPIO_GPODR1, 32); SAVE(GPIO_GPODR2, 32);
 +	SAVE(GPIO_GPODR3, 32);
-+	SAVE(GPIO_GPPUR0, 32); SAVE(GPIO_GPPUR1, 32); SAVE(GPIO_GPPUR2, 32); 
++	SAVE(GPIO_GPPUR0, 32); SAVE(GPIO_GPPUR1, 32); SAVE(GPIO_GPPUR2, 32);
 +	SAVE(GPIO_GPPUR3, 32);
-+	SAVE(GPIO_GPALR0, 32); SAVE(GPIO_GPALR1, 32); SAVE(GPIO_GPALR2, 32); 
++	SAVE(GPIO_GPALR0, 32); SAVE(GPIO_GPALR1, 32); SAVE(GPIO_GPALR2, 32);
 +	SAVE(GPIO_GPALR3, 32);
-+	SAVE(GPIO_GPAUR0, 32); SAVE(GPIO_GPAUR1, 32); SAVE(GPIO_GPAUR2, 32); 
++	SAVE(GPIO_GPAUR0, 32); SAVE(GPIO_GPAUR1, 32); SAVE(GPIO_GPAUR2, 32);
 +	SAVE(GPIO_GPAUR3, 32);
-+	SAVE(GPIO_GPIDLR0, 32); SAVE(GPIO_GPIDLR1, 32);	SAVE(GPIO_GPIDLR2, 32); 
++	SAVE(GPIO_GPIDLR0, 32); SAVE(GPIO_GPIDLR1, 32);	SAVE(GPIO_GPIDLR2, 32);
 +	SAVE(GPIO_GPIDLR3, 32);
-+	SAVE(GPIO_GPIDUR0, 32);	SAVE(GPIO_GPIDUR1, 32);	SAVE(GPIO_GPIDUR2, 32);	
++	SAVE(GPIO_GPIDUR0, 32);	SAVE(GPIO_GPIDUR1, 32);	SAVE(GPIO_GPIDUR2, 32);
 +	SAVE(GPIO_GPIDUR3, 32);
-+	SAVE(GPIO_GPIER0, 32); SAVE(GPIO_GPIER1, 32); SAVE(GPIO_GPIER2, 32); 
++	SAVE(GPIO_GPIER0, 32); SAVE(GPIO_GPIER1, 32); SAVE(GPIO_GPIER2, 32);
 +	SAVE(GPIO_GPIER3, 32);
-+	SAVE(GPIO_GPIMR0, 32); SAVE(GPIO_GPIMR1, 32); SAVE(GPIO_GPIMR2, 32); 
++	SAVE(GPIO_GPIMR0, 32); SAVE(GPIO_GPIMR1, 32); SAVE(GPIO_GPIMR2, 32);
 +	SAVE(GPIO_GPIMR3, 32);
-+	SAVE(GPIO_GPFR0, 32); SAVE(GPIO_GPFR1, 32); SAVE(GPIO_GPFR2, 32); 
++	SAVE(GPIO_GPFR0, 32); SAVE(GPIO_GPFR1, 32); SAVE(GPIO_GPFR2, 32);
 +	SAVE(GPIO_GPFR3, 32);
 +
 +	SAVE(DMAC_DMACR, 32);
-+	SAVE(DMAC_DSAR0, 32); SAVE(DMAC_DSAR1, 32); SAVE(DMAC_DSAR2, 32); SAVE(DMAC_DSAR3, 32); SAVE(DMAC_DSAR4, 32); SAVE(DMAC_DSAR5, 32); SAVE(DMAC_DSAR6, 32); SAVE(DMAC_DSAR7, 32); 
-+	SAVE(DMAC_DDAR0, 32); SAVE(DMAC_DDAR1, 32); SAVE(DMAC_DDAR2, 32); SAVE(DMAC_DDAR3, 32); SAVE(DMAC_DDAR4, 32); SAVE(DMAC_DDAR5, 32); SAVE(DMAC_DDAR6, 32); SAVE(DMAC_DDAR7, 32); 
-+	SAVE(DMAC_DTCR0, 32); SAVE(DMAC_DTCR1, 32); SAVE(DMAC_DTCR2, 32); SAVE(DMAC_DTCR3, 32); SAVE(DMAC_DTCR4, 32); SAVE(DMAC_DTCR5, 32); SAVE(DMAC_DTCR6, 32); SAVE(DMAC_DTCR7, 32); 
-+	SAVE(DMAC_DRSR0, 32); SAVE(DMAC_DRSR1, 32); SAVE(DMAC_DRSR2, 32); SAVE(DMAC_DRSR3, 32); SAVE(DMAC_DRSR4, 32); SAVE(DMAC_DRSR5, 32); SAVE(DMAC_DRSR6, 32); SAVE(DMAC_DRSR7, 32); 
++	SAVE(DMAC_DSAR0, 32); SAVE(DMAC_DSAR1, 32); SAVE(DMAC_DSAR2, 32); SAVE(DMAC_DSAR3, 32); SAVE(DMAC_DSAR4, 32); SAVE(DMAC_DSAR5, 32); SAVE(DMAC_DSAR6, 32); SAVE(DMAC_DSAR7, 32);
++	SAVE(DMAC_DDAR0, 32); SAVE(DMAC_DDAR1, 32); SAVE(DMAC_DDAR2, 32); SAVE(DMAC_DDAR3, 32); SAVE(DMAC_DDAR4, 32); SAVE(DMAC_DDAR5, 32); SAVE(DMAC_DDAR6, 32); SAVE(DMAC_DDAR7, 32);
++	SAVE(DMAC_DTCR0, 32); SAVE(DMAC_DTCR1, 32); SAVE(DMAC_DTCR2, 32); SAVE(DMAC_DTCR3, 32); SAVE(DMAC_DTCR4, 32); SAVE(DMAC_DTCR5, 32); SAVE(DMAC_DTCR6, 32); SAVE(DMAC_DTCR7, 32);
++	SAVE(DMAC_DRSR0, 32); SAVE(DMAC_DRSR1, 32); SAVE(DMAC_DRSR2, 32); SAVE(DMAC_DRSR3, 32); SAVE(DMAC_DRSR4, 32); SAVE(DMAC_DRSR5, 32); SAVE(DMAC_DRSR6, 32); SAVE(DMAC_DRSR7, 32);
 +	SAVE(DMAC_DCCSR0, 32); SAVE(DMAC_DCCSR1, 32); SAVE(DMAC_DCCSR2, 32); SAVE(DMAC_DCCSR3, 32); SAVE(DMAC_DCCSR4, 32); SAVE(DMAC_DCCSR5, 32); SAVE(DMAC_DCCSR6, 32); SAVE(DMAC_DCCSR7, 32);
 +
 +	SAVE(INTC_IPR, 32);SAVE(INTC_ISR, 32);SAVE(INTC_IMR, 32);
@@ -14140,7 +14140,7 @@
 +	SAVE(WDT_WTCNT, 32);SAVE(WDT_WTCSR, 8);
 +
 +	/* Mask all interrupts */
-+	REG_INTC_IMSR = 0xffffffff; 
++	REG_INTC_IMSR = 0xffffffff;
 +
 +	/* Save module clocks */
 +	SAVE(CPM_MSCR, 32);
@@ -14201,31 +14201,31 @@
 +
 +	/* Restore registers */
 +
-+	RESTORE(GPIO_GPDR0, 32); RESTORE(GPIO_GPDR1, 32); RESTORE(GPIO_GPDR2, 32); 
++	RESTORE(GPIO_GPDR0, 32); RESTORE(GPIO_GPDR1, 32); RESTORE(GPIO_GPDR2, 32);
 +	RESTORE(GPIO_GPDR3, 32);
-+	RESTORE(GPIO_GPDIR0, 32); RESTORE(GPIO_GPDIR1, 32); RESTORE(GPIO_GPDIR2, 32); 
++	RESTORE(GPIO_GPDIR0, 32); RESTORE(GPIO_GPDIR1, 32); RESTORE(GPIO_GPDIR2, 32);
 +	RESTORE(GPIO_GPDIR3, 32);
-+	RESTORE(GPIO_GPODR0, 32); RESTORE(GPIO_GPODR1, 32); RESTORE(GPIO_GPODR2, 32); 
++	RESTORE(GPIO_GPODR0, 32); RESTORE(GPIO_GPODR1, 32); RESTORE(GPIO_GPODR2, 32);
 +	RESTORE(GPIO_GPODR3, 32);
-+	RESTORE(GPIO_GPPUR0, 32); RESTORE(GPIO_GPPUR1, 32); RESTORE(GPIO_GPPUR2, 32); 
++	RESTORE(GPIO_GPPUR0, 32); RESTORE(GPIO_GPPUR1, 32); RESTORE(GPIO_GPPUR2, 32);
 +	RESTORE(GPIO_GPPUR3, 32);
-+	RESTORE(GPIO_GPALR0, 32); RESTORE(GPIO_GPALR1, 32); RESTORE(GPIO_GPALR2, 32); 
++	RESTORE(GPIO_GPALR0, 32); RESTORE(GPIO_GPALR1, 32); RESTORE(GPIO_GPALR2, 32);
 +	RESTORE(GPIO_GPALR3, 32);
-+	RESTORE(GPIO_GPAUR0, 32); RESTORE(GPIO_GPAUR1, 32); RESTORE(GPIO_GPAUR2, 32); 
++	RESTORE(GPIO_GPAUR0, 32); RESTORE(GPIO_GPAUR1, 32); RESTORE(GPIO_GPAUR2, 32);
 +	RESTORE(GPIO_GPAUR3, 32);
 +	RESTORE(GPIO_GPIDLR0, 32);RESTORE(GPIO_GPIDLR1, 32);RESTORE(GPIO_GPIDLR2, 32);
 +	RESTORE(GPIO_GPIDLR3, 32);
-+	RESTORE(GPIO_GPIDUR0, 32);RESTORE(GPIO_GPIDUR1, 32);RESTORE(GPIO_GPIDUR2, 32); 
++	RESTORE(GPIO_GPIDUR0, 32);RESTORE(GPIO_GPIDUR1, 32);RESTORE(GPIO_GPIDUR2, 32);
 +	RESTORE(GPIO_GPIDUR3, 32);
 +	RESTORE(GPIO_GPIER0, 32); RESTORE(GPIO_GPIER1, 32); RESTORE(GPIO_GPIER2, 32);
 +	RESTORE(GPIO_GPIER3, 32);
-+	RESTORE(GPIO_GPIMR0, 32); RESTORE(GPIO_GPIMR1, 32); RESTORE(GPIO_GPIMR2, 32); 
++	RESTORE(GPIO_GPIMR0, 32); RESTORE(GPIO_GPIMR1, 32); RESTORE(GPIO_GPIMR2, 32);
 +	RESTORE(GPIO_GPIMR3, 32);
-+	RESTORE(GPIO_GPFR0, 32); RESTORE(GPIO_GPFR1, 32); RESTORE(GPIO_GPFR2, 32); 
++	RESTORE(GPIO_GPFR0, 32); RESTORE(GPIO_GPFR1, 32); RESTORE(GPIO_GPFR2, 32);
 +	RESTORE(GPIO_GPFR3, 32);
 +
-+	RESTORE(EMC_SMCR0, 32); RESTORE(EMC_SMCR1, 32); RESTORE(EMC_SMCR2, 32); RESTORE(EMC_SMCR3, 32); 
-+	RESTORE(EMC_SMCR4, 32); RESTORE(EMC_SMCR5, 32); 
++	RESTORE(EMC_SMCR0, 32); RESTORE(EMC_SMCR1, 32); RESTORE(EMC_SMCR2, 32); RESTORE(EMC_SMCR3, 32);
++	RESTORE(EMC_SMCR4, 32); RESTORE(EMC_SMCR5, 32);
 +
 +	RESTORE(HARB_HAPOR, 32); RESTORE(HARB_HMCTR, 32); RESTORE(HARB_HMLTR, 32);
 +
@@ -14235,10 +14235,10 @@
 +	RESTORE(OST_TER, 8);
 +
 +	RESTORE(DMAC_DMACR, 32);
-+	RESTORE(DMAC_DSAR0, 32); RESTORE(DMAC_DSAR1, 32); RESTORE(DMAC_DSAR2, 32); RESTORE(DMAC_DSAR3, 32); RESTORE(DMAC_DSAR4, 32); RESTORE(DMAC_DSAR5, 32); RESTORE(DMAC_DSAR6, 32); RESTORE(DMAC_DSAR7, 32); 
-+	RESTORE(DMAC_DDAR0, 32); RESTORE(DMAC_DDAR1, 32); RESTORE(DMAC_DDAR2, 32); RESTORE(DMAC_DDAR3, 32); RESTORE(DMAC_DDAR4, 32); RESTORE(DMAC_DDAR5, 32); RESTORE(DMAC_DDAR6, 32); RESTORE(DMAC_DDAR7, 32); 
-+	RESTORE(DMAC_DTCR0, 32); RESTORE(DMAC_DTCR1, 32); RESTORE(DMAC_DTCR2, 32); RESTORE(DMAC_DTCR3, 32); RESTORE(DMAC_DTCR4, 32); RESTORE(DMAC_DTCR5, 32); RESTORE(DMAC_DTCR6, 32); RESTORE(DMAC_DTCR7, 32); 
-+	RESTORE(DMAC_DRSR0, 32); RESTORE(DMAC_DRSR1, 32); RESTORE(DMAC_DRSR2, 32); RESTORE(DMAC_DRSR3, 32); RESTORE(DMAC_DRSR4, 32); RESTORE(DMAC_DRSR5, 32); RESTORE(DMAC_DRSR6, 32); RESTORE(DMAC_DRSR7, 32); 
++	RESTORE(DMAC_DSAR0, 32); RESTORE(DMAC_DSAR1, 32); RESTORE(DMAC_DSAR2, 32); RESTORE(DMAC_DSAR3, 32); RESTORE(DMAC_DSAR4, 32); RESTORE(DMAC_DSAR5, 32); RESTORE(DMAC_DSAR6, 32); RESTORE(DMAC_DSAR7, 32);
++	RESTORE(DMAC_DDAR0, 32); RESTORE(DMAC_DDAR1, 32); RESTORE(DMAC_DDAR2, 32); RESTORE(DMAC_DDAR3, 32); RESTORE(DMAC_DDAR4, 32); RESTORE(DMAC_DDAR5, 32); RESTORE(DMAC_DDAR6, 32); RESTORE(DMAC_DDAR7, 32);
++	RESTORE(DMAC_DTCR0, 32); RESTORE(DMAC_DTCR1, 32); RESTORE(DMAC_DTCR2, 32); RESTORE(DMAC_DTCR3, 32); RESTORE(DMAC_DTCR4, 32); RESTORE(DMAC_DTCR5, 32); RESTORE(DMAC_DTCR6, 32); RESTORE(DMAC_DTCR7, 32);
++	RESTORE(DMAC_DRSR0, 32); RESTORE(DMAC_DRSR1, 32); RESTORE(DMAC_DRSR2, 32); RESTORE(DMAC_DRSR3, 32); RESTORE(DMAC_DRSR4, 32); RESTORE(DMAC_DRSR5, 32); RESTORE(DMAC_DRSR6, 32); RESTORE(DMAC_DRSR7, 32);
 +	RESTORE(DMAC_DCCSR0, 32); RESTORE(DMAC_DCCSR1, 32); RESTORE(DMAC_DCCSR2, 32); RESTORE(DMAC_DCCSR3, 32); RESTORE(DMAC_DCCSR4, 32); RESTORE(DMAC_DCCSR5, 32); RESTORE(DMAC_DCCSR6, 32); RESTORE(DMAC_DCCSR7, 32);
 +
 +	RESTORE(INTC_IPR, 32);RESTORE(INTC_ISR, 32);RESTORE(INTC_IMR, 32);
@@ -14256,7 +14256,7 @@
 +	REG8(UART1_FCR) = UARTFCR_FE | UARTFCR_RFLS | UARTFCR_TFLS | UARTFCR_UUE;
 +	REG8(UART2_FCR) = UARTFCR_FE | UARTFCR_RFLS | UARTFCR_TFLS | UARTFCR_UUE;
 +	REG8(UART3_FCR) = UARTFCR_FE | UARTFCR_RFLS | UARTFCR_TFLS | UARTFCR_UUE;
-+ 
++
 +	REG8(UART0_LCR) |= UARTLCR_DLAB; /* Access to DLLR/DLHR */
 +	RESTORE(UART0_DLLR, 8);	RESTORE(UART0_DLHR, 8);
 +	REG8(UART0_LCR) &= ~UARTLCR_DLAB; /* Access to IER */
@@ -14304,7 +14304,7 @@
 +
 +/* NOTES:
 + * 1: Pins that are floated (NC) should be set as input and pull-enable.
-+ * 2: Pins that are pull-up or pull-down by outside should be set as input 
++ * 2: Pins that are pull-up or pull-down by outside should be set as input
 + *    and pull-disable.
 + * 3: Pins that are connected to a chipset should be set as pull-disable.
 + */
@@ -14416,7 +14416,7 @@
 +	__gpio_disable_pull(29);
 +	__gpio_as_output(29);
 +	__cpm_clear_pin(29);  /* disable USB 48MHz clock */
-+	
++
 +	/* GP30 */
 +	/* GP31 */
 +
@@ -14820,7 +14820,7 @@
 +	jz_board_pm_gpio_setup();
 +
 +	/* Allow next interrupts to wakeup the system.
-+	 */	
++	 */
 +	REG_CPM_WER = 0;              /* Clear all first */
 +
 +	/* RTC alarm */
@@ -14906,7 +14906,7 @@
 +	/* Restore interrupts */
 +	REG_INTC_IMSR = imr;
 +	REG_INTC_IMCR = ~imr;
-+	
++
 +	/* Restore current time */
 +	xtime.tv_sec = REG_RTC_RSR;
 +#endif
@@ -14996,7 +14996,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/suspend invokes this function 
++ * A write to /proc/sys/pm/suspend invokes this function
 + * which initiates a sleep.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_sleep(void)
@@ -15092,7 +15092,7 @@
 +	return len;
 +}
 +
-+/* 
++/*
 + * Power Manager Module
 + */
 +static int pmc_read_proc (char *page, char **start, off_t off,
@@ -15103,10 +15103,10 @@
 +	unsigned long mscr = REG_CPM_MSCR;
 +
 +	len += sprintf (page+len, "LPCR           : 0x%08lx\n", lpcr);
-+	len += sprintf (page+len, "Low Power Mode : %s\n", 
++	len += sprintf (page+len, "Low Power Mode : %s\n",
 +			((lpcr & CPM_LPCR_LPM_MASK) == (CPM_LPCR_LPM_IDLE)) ?
 +			"idle" : (((lpcr & CPM_LPCR_LPM_MASK) == (CPM_LPCR_LPM_SLEEP)) ? "sleep" : "hibernate"));
-+	len += sprintf (page+len, "Doze Mode      : %s\n", 
++	len += sprintf (page+len, "Doze Mode      : %s\n",
 +			(lpcr & CPM_LPCR_DOZE) ? "on" : "off");
 +	if (lpcr & CPM_LPCR_DOZE)
 +		len += sprintf (page+len, "     duty      : %d\n", (int)((lpcr & CPM_LPCR_DUTY_MASK) >> CPM_LPCR_DUTY_BIT));
@@ -15162,14 +15162,14 @@
 +
 +	len += sprintf (page+len, "PLCR1          : 0x%08x\n", plcr1);
 +	len += sprintf (page+len, "CFCR           : 0x%08x\n", cfcr);
-+	len += sprintf (page+len, "PLL            : %s\n", 
++	len += sprintf (page+len, "PLL            : %s\n",
 +			(plcr1 & CPM_PLCR1_PLL1EN) ? "ON" : "OFF");
 +	len += sprintf (page+len, "NF:NR:NO       : %d:%d:%d\n",
 +			__cpm_plcr1_fd() + 2,
 +			__cpm_plcr1_rd() + 2,
 +			od[__cpm_plcr1_od()]
 +		);
-+	len += sprintf (page+len, "I:S:M:P        : %d:%d:%d:%d\n", 
++	len += sprintf (page+len, "I:S:M:P        : %d:%d:%d:%d\n",
 +			div[(cfcr & CPM_CFCR_IFR_MASK) >> CPM_CFCR_IFR_BIT],
 +			div[(cfcr & CPM_CFCR_SFR_MASK) >> CPM_CFCR_SFR_BIT],
 +			div[(cfcr & CPM_CFCR_MFR_MASK) >> CPM_CFCR_MFR_BIT],
@@ -15196,7 +15196,7 @@
 +	return count;
 +}
 +
-+/* 
++/*
 + * WDT
 + */
 +static int wdt_read_proc (char *page, char **start, off_t off,
@@ -15241,7 +15241,7 @@
 +	REG8(data) = simple_strtoul(buffer, 0, 16);
 +	return count;
 +}
-+                         
++
 +static int proc_jz_pwm_write_word(struct file *file, const char *buffer, unsigned long count, void *data)
 +{
 +	REG16(data) =  simple_strtoul(buffer, 0, 16);
@@ -15250,7 +15250,7 @@
 +
 +#define PWM_NUM 2
 +
-+static int jz_pwm_proc_init(void) 
++static int jz_pwm_proc_init(void)
 +{
 +	struct proc_dir_entry *proc_jz_pwm, *res;
 +	char name[16];
@@ -15943,9 +15943,9 @@
 +	nop
 +
 +	/* enter hibernate mode */
-+	.set	mips3	
++	.set	mips3
 +	wait
-+	nop	
++	nop
 +	.set	mips2
 +
 +2:	j	2b		/* loop waiting for suspended */
@@ -16787,7 +16787,7 @@
 +/*
 + * linux/arch/mips/jz4740/cpufreq.c
 + *
-+ * cpufreq driver for JZ4740 
++ * cpufreq driver for JZ4740
 + *
 + * Copyright (c) 2006-2007  Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
@@ -16860,7 +16860,7 @@
 +
 +static void jz_update_clocks(void)
 +{
-+	/* Next clocks must be updated if we have changed 
++	/* Next clocks must be updated if we have changed
 +	 * the PLL or divisors.
 +	 */
 +	jz_clocks.cclk = __cpm_get_cclk();
@@ -16888,7 +16888,7 @@
 +		/* the first time to scale frequencies */
 +		unsigned int dmcr, rtcor;
 +		unsigned int tras, rcd, tpc, trwl, trc;
-+		
++
 +		dmcr = REG_EMC_DMCR;
 +		rtcor = REG_EMC_RTCOR;
 +
@@ -16913,7 +16913,7 @@
 +static void jz_update_dram_rtcor(unsigned int new_mclk)
 +{
 +	unsigned int rtcor;
-+	
++
 +	new_mclk /= 1000;
 +	rtcor = boot_config.rtcor * new_mclk / boot_config.mclk;
 +	rtcor--;
@@ -16977,10 +16977,10 @@
 +
 +	trc = (trc < 1) ? 1: trc;
 +	trc = (trc > 15) ? 15: trc;
-+	trc /= 2;	
++	trc /= 2;
 +
 +	dmcr = REG_EMC_DMCR;
-+	
++
 +	dmcr &= ~(EMC_DMCR_TRAS_MASK | EMC_DMCR_RCD_MASK | EMC_DMCR_TPC_MASK | EMC_DMCR_TRWL_MASK | EMC_DMCR_TRC_MASK);
 +	dmcr |= ((tras << EMC_DMCR_TRAS_BIT) | (rcd << EMC_DMCR_RCD_BIT) | (tpc << EMC_DMCR_TPC_BIT) | (trwl << EMC_DMCR_TRWL_BIT) | (trc << EMC_DMCR_TRC_BIT));
 +
@@ -16988,7 +16988,7 @@
 +}
 +
 +static void jz_update_dram_prev(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so first update TRAS, RCD, TPC, TRWL
@@ -17004,11 +17004,11 @@
 +}
 +
 +static void jz_update_dram_post(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so update RTCOR
-+		 * after changing the frequency 
++		 * after changing the frequency
 +		 */
 +		jz_update_dram_rtcor(new_mclk);
 +	} else {
@@ -17024,7 +17024,7 @@
 +	unsigned int cpccr;
 +	unsigned int cur_mclk, new_mclk;
 +	int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	cpccr = REG_CPM_CPCCR;
 +	cpccr &= ~((unsigned long)regs->cpccr_mask);
@@ -17063,10 +17063,10 @@
 +#ifdef CHANGE_PLL
 +/* Maintain the LCD clock and pixel clock */
 +static void jz_scale_lcd_divisors(struct dpm_regs *regs)
-+{	
++{
 +	unsigned int new_pll, new_lcd_div, new_lcdpix_div;
 +	unsigned int cpccr;
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	if (!boot_config.lcd_clks_initialized) return;
 +
@@ -17133,7 +17133,7 @@
 +	 */
 +	jz_update_dram_prev(cur_mclk, new_mclk);
 +
-+	/* 
++	/*
 +	 * Update PLL, align code to cache line.
 +	 */
 +	cppcr |= CPM_CPPCR_PLLEN;
@@ -17165,9 +17165,9 @@
 +	jz_init_boot_config();
 +
 +#ifdef CHANGE_PLL
-+	/* 
++	/*
 +	 * Disable LCD before scaling pll.
-+	 * LCD and LCD pixel clocks should not be changed even if the PLL 
++	 * LCD and LCD pixel clocks should not be changed even if the PLL
 +	 * output frequency has been changed.
 +	 */
 +	REG_LCD_CTRL &= ~LCD_CTRL_ENA;
@@ -17266,9 +17266,9 @@
 +
 +	dprintk("divisors of I:S:P:M = %d:%d:%d:%d\n", div[0], div[1], div[2], div[3]);
 +
-+	regs->cpccr = 
-+		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) | 
-+		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) | 
++	regs->cpccr =
++		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) |
++		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) |
 +		(n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
 +		(n2FR[div[3]] << CPM_CPCCR_MDIV_BIT);
 +
@@ -17394,7 +17394,7 @@
 + *
 + * Support functions for the JZ4740 internal DMA channels.
 + * No-descriptor transfer only.
-+ * Descriptor transfer should also call jz_request_dma() to get a free 
++ * Descriptor transfer should also call jz_request_dma() to get a free
 + * channel and call jz_free_dma() to free the channel. And driver should
 + * build the DMA descriptor and setup the DMA channel by itself.
 + *
@@ -17867,7 +17867,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("oss_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -17901,7 +17901,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("alsa_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -18109,7 +18109,7 @@
 +	desc->dsadr = dma_src_phys_addr + 8192;	/* DMA source address */
 +	desc->dtadr = dma_dst_phys_addr + 8192;	/* DMA target address */
 +	desc->ddadr = (next << 24) + 256;    /* size: 256*16 bytes = 4096 bytes */
-+	
++
 +	desc++;
 +	next = (dma_desc_phys_addr + 4*(sizeof(jz_dma_desc))) >> 4;
 +
@@ -18162,9 +18162,9 @@
 @@ -0,0 +1,273 @@
 +/*
 + * linux/arch/mips/jz4740/i2c.c
-+ * 
++ *
 + * Jz4740 I2C routines.
-+ * 
++ *
 + * Copyright (C) 2005,2006 Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
 + *
@@ -18647,7 +18647,7 @@
 +		disable_intc_irq(i);
 +		irq_desc[i].chip = &intc_irq_type;
 +	}
-+	
++
 +	/* Set up DMAC irq
 +	 */
 +	for (i = 0; i < NUM_DMA; i++) {
@@ -18878,16 +18878,16 @@
 @@ -0,0 +1,462 @@
 +/*
 + * linux/arch/mips/jz4740/common/pm.c
-+ * 
++ *
 + * JZ4740 Power Management Routines
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
 + *  This program is free software; you can distribute it and/or modify it
 + *  under the terms of the GNU General Public License (Version 2) as
 + *  published by the Free Software Foundation.
-+ * 
++ *
 + *  This program is distributed in the hope it will be useful, but WITHOUT
 + *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 + *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
@@ -18896,7 +18896,7 @@
 + *  You should have received a copy of the GNU General Public License along
 + *  with this program; if not, write to the Free Software Foundation, Inc.,
 + *  59 Temple Place - Suite 330, Boston MA 02111-1307, USA.
-+ * 
++ *
 + */
 +
 +#include <linux/init.h>
@@ -18904,14 +18904,14 @@
 +#include <linux/pm_legacy.h>
 +#include <linux/sched.h>
 +#include <linux/interrupt.h>
-+#include <linux/proc_fs.h>   
++#include <linux/proc_fs.h>
 +#include <linux/sysctl.h>
 +
 +#include <asm/cacheops.h>
 +#include <asm/jzsoc.h>
 +
 +#undef DEBUG
-+//#define DEBUG 
++//#define DEBUG
 +#ifdef DEBUG
 +#define dprintk(x...)	printk(x)
 +#else
@@ -18920,10 +18920,10 @@
 +
 +#define GPIO_WAKEUP 125 /* set SW7(GPIO 125) as WAKEUP key */
 +
-+/* 
++/*
 + * __gpio_as_sleep set all pins to pull-disable, and set all pins as input
-+ * except sdram, nand flash pins and the pins which can be used as CS1_N  
-+ * to CS4_N for chip select. 
++ * except sdram, nand flash pins and the pins which can be used as CS1_N
++ * to CS4_N for chip select.
 + */
 +#define __gpio_as_sleep()	              \
 +do {	                                      \
@@ -18948,8 +18948,8 @@
 +	/* Mask all interrupts */
 +	REG_INTC_IMSR = 0xffffffff;
 +
-+	/* 
-+	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled 
++	/*
++	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled
 +	 * through  RTC driver's ioctl (linux/driver/char/rtc_jz.c).
 +	 */
 +
@@ -18982,15 +18982,15 @@
 +
 +/* NOTES:
 + * 1: Pins that are floated (NC) should be set as input and pull-enable.
-+ * 2: Pins that are pull-up or pull-down by outside should be set as input 
++ * 2: Pins that are pull-up or pull-down by outside should be set as input
 + *    and pull-disable.
-+ * 3: Pins that are connected to a chip except sdram and nand flash 
++ * 3: Pins that are connected to a chip except sdram and nand flash
 + *    should be set as input and pull-disable, too.
 + */
 +static void jz_board_do_sleep(unsigned long *ptr)
 +{
 +	unsigned char i;
-+        
++
 +        /* Print messages of GPIO registers for debug */
 +	for(i=0;i<4;i++) {
 +		dprintk("run dat:%x pin:%x fun:%x sel:%x dir:%x pull:%x msk:%x trg:%x\n",        \
@@ -19010,31 +19010,31 @@
 +	}
 +
 +        /*
-+         * Set all pins to pull-disable, and set all pins as input except 
-+         * sdram, nand flash pins and the pins which can be used as CS1_N 
-+         * to CS4_N for chip select. 
++         * Set all pins to pull-disable, and set all pins as input except
++         * sdram, nand flash pins and the pins which can be used as CS1_N
++         * to CS4_N for chip select.
 +         */
 +        __gpio_as_sleep();
 +
 +        /*
 +	 * Set proper status for GPB25 to GPB28 which can be used as CS1_N to CS4_N.
-+	 * Keep the pins' function used for chip select(CS) here according to your   
++	 * Keep the pins' function used for chip select(CS) here according to your
 +         * system to avoid chip select crashing with sdram when resuming from sleep mode.
 +         */
 +
-+#if defined(CONFIG_JZ4740_PAVO)   
-+        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */ 
++#if defined(CONFIG_JZ4740_PAVO)
++        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */
 +
 +        /* GPB26/CS2_N is connected to nand flash, needn't be changed. */
 +
-+        /* GPB27/CS3_N is used as EXT_INT for CS8900 on debug board, it should be set as input.*/ 
++        /* GPB27/CS3_N is used as EXT_INT for CS8900 on debug board, it should be set as input.*/
 +	__gpio_as_input(32+27);
 +
 +        /* GPB28/CS4_N is used as cs8900's chip select, shouldn't be changed. */
 +#endif
 +
-+ 	/* 
-+         * Enable pull for NC pins here according to your system 
++ 	/*
++         * Enable pull for NC pins here according to your system
 +	 */
 +
 +#if defined(CONFIG_JZ4740_PAVO)
@@ -19053,8 +19053,8 @@
 +	}
 +#endif
 +
-+	/* 
-+         * If you must set some GPIOs as output to high level or low level,  
++	/*
++         * If you must set some GPIOs as output to high level or low level,
 +         * you can set them here, using:
 +         * __gpio_as_output(n);
 +         * __gpio_set_pin(n); or  __gpio_clear_pin(n);
@@ -19098,10 +19098,10 @@
 +
 +		 REG_GPIO_PXIMS(i)=*ptr;
 +		 REG_GPIO_PXIMC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXDATS(i)=*ptr;
 +		 REG_GPIO_PXDATC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXTRGS(i)=*ptr;
 +		 REG_GPIO_PXTRGC(i)=~(*ptr++);
 +	}
@@ -19117,7 +19117,7 @@
 +
 +
 +static int jz_pm_do_sleep(void)
-+{ 
++{
 +	unsigned long delta;
 +	unsigned long nfcsr = REG_EMC_NFCSR;
 +	unsigned long scr = REG_CPM_SCR;
@@ -19190,10 +19190,10 @@
 +	/* Restore interrupts */
 +	REG_INTC_IMSR = imr;
 +	REG_INTC_IMCR = ~imr;
-+	
++
 +	/* Restore sadc */
 +	REG_SADC_ENA = sadc;
-+	
++
 +	/* Resume on-board modules */
 +	jz_board_do_resume(sleep_gpio_save);
 +
@@ -19267,7 +19267,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/suspend invokes this function 
++ * A write to /proc/sys/pm/suspend invokes this function
 + * which initiates a sleep.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_sleep(struct ctl_table *ctl, int write, struct file * filp,
@@ -19279,7 +19279,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/hibernate invokes this function 
++ * A write to /proc/sys/pm/hibernate invokes this function
 + * which initiates a poweroff.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_hibernate(struct ctl_table *ctl, int write, struct file * filp,
@@ -19343,9 +19343,9 @@
 @@ -0,0 +1,887 @@
 +/*
 + * linux/arch/mips/jz4740/proc.c
-+ * 
++ *
 + * /proc/jz/ procfs for jz4740 on-chip modules.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -19403,7 +19403,7 @@
 +	return len;
 +}
 +
-+/* 
++/*
 + * Power Manager Module
 + */
 +static int pmc_read_proc (char *page, char **start, off_t off,
@@ -19413,11 +19413,11 @@
 +	unsigned long lcr = REG_CPM_LCR;
 +	unsigned long clkgr = REG_CPM_CLKGR;
 +
-+	len += sprintf (page+len, "Low Power Mode : %s\n", 
++	len += sprintf (page+len, "Low Power Mode : %s\n",
 +			((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_IDLE)) ?
-+			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ? 
++			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ?
 +				  "SLEEP" : "HIBERNATE"));
-+	len += sprintf (page+len, "Doze Mode      : %s\n", 
++	len += sprintf (page+len, "Doze Mode      : %s\n",
 +			(lcr & CPM_LCR_DOZE_ON) ? "on" : "off");
 +	if (lcr & CPM_LCR_DOZE_ON)
 +		len += sprintf (page+len, "     duty      : %d\n", (int)((lcr & CPM_LCR_DOZE_DUTY_MASK) >> CPM_LCR_DOZE_DUTY_BIT));
@@ -19479,14 +19479,14 @@
 +
 +	len += sprintf (page+len, "CPPCR          : 0x%08x\n", cppcr);
 +	len += sprintf (page+len, "CPCCR          : 0x%08x\n", cpccr);
-+	len += sprintf (page+len, "PLL            : %s\n", 
++	len += sprintf (page+len, "PLL            : %s\n",
 +			(cppcr & CPM_CPPCR_PLLEN) ? "ON" : "OFF");
 +	len += sprintf (page+len, "m:n:o          : %d:%d:%d\n",
 +			__cpm_get_pllm() + 2,
 +			__cpm_get_plln() + 2,
 +			od[__cpm_get_pllod()]
 +		);
-+	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n", 
++	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n",
 +			div[__cpm_get_cdiv()],
 +			div[__cpm_get_hdiv()],
 +			div[__cpm_get_mdiv()],
@@ -19555,7 +19555,7 @@
 +
 +		len += sprintf (page+len, "REMOVE\n");
 +	}
-+                                                                                                               
++
 +        return len;
 +}
 +
@@ -19586,12 +19586,12 @@
 +
 +#ifdef CONFIG_RESERVE_IPU_MEM
 +
-+/* USAGE:  
++/* USAGE:
 + * echo n  > /proc/jz/ipu 	// n = [1,...,9], alloc mem, 2^n pages.
 + * echo FF > /proc/jz/ipu 	// 255, free all buffer
 + * echo xxxx > /proc/jz/ipu 	// free buffer which addr is xxxx
 + * echo llll > /proc/jz/ipu 	// add_wired_entry(l,l,l,l)
-+ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf 
++ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf
 + * od -X /proc/jz/ipu 		// read mem addr
 + */
 +
@@ -19710,8 +19710,8 @@
 +
 +static void ipu_del_wired_entry( void )
 +{
-+	unsigned long flags;	
-+	unsigned long wired;	
++	unsigned long flags;
++	unsigned long wired;
 +
 +	/* Free all lock entry */
 +	local_irq_save(flags);
@@ -19757,11 +19757,11 @@
 +	unsigned char * virt_addr, *addr;
 +	int cnt, i;
 +
-+	if ( phys_addr == 0 ) 
++	if ( phys_addr == 0 )
 +		return ;
 +
-+	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt ) 
-+		if ( phys_addr == ipu_buf[cnt].addr ) 
++	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt )
++		if ( phys_addr == ipu_buf[cnt].addr )
 +			break;
 +
 +	if ( cnt == IPU_BUF_MAX ) {	/* addr not in the ipu buffers */
@@ -19797,7 +19797,7 @@
 +		printk("no free buffer.\n");
 +		*pint = 0;
 +	}
-+	else 
++	else
 +		*pint = (unsigned int )ipu_buf[ipu_buf_cnt].addr; /* phys addr */
 +	len += sizeof(unsigned int);
 +
@@ -19833,11 +19833,11 @@
 +		for (i=0;i<12;i++) buf[i]=0;
 +		strncpy(buf, buffer+8*4, 8);
 +		pagemask = simple_strtoul(buf, 0, 16);
-+		
-+#if defined(DEBUG)		
-+		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n", 
++
++#if defined(DEBUG)
++		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n",
 +		       pid, entrylo0, entrylo1, entryhi, pagemask);
-+#endif		
++#endif
 +		ipu_add_wired_entry( pid, entrylo0, entrylo1, entryhi, pagemask);
 +		return 41;
 +	} else if ( count <= 8+1 ) {
@@ -19845,19 +19845,19 @@
 +		strncpy(buf, buffer, 8);
 +		val = simple_strtoul(buf, 0, 16);
 +	} else if (count == 44) {
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer, 10);
 +		pid = simple_strtoul(buf, 0, 16);
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 11, 10);
 +		entryhi = simple_strtoul(buf, 0, 16);//vaddr
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 22, 10);
 +		entrylo0 = simple_strtoul(buf, 0, 16);//paddr
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 33, 10);
 +		pagemask = simple_strtoul(buf, 0, 16);
@@ -19871,8 +19871,8 @@
 +
 +	/* val: 1-9, page_shift,  val>= 10: ipu_buf.addr */
 +	if ( val == 0 ) {	/* debug, print ipu_buf info */
-+		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt) 
-+			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n", 
++		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt)
++			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n",
 +			       cnt, ipu_buf[cnt].addr, ipu_buf[cnt].page_shift );
 +#if defined(DEBUG)
 +		show_tlb();
@@ -19886,7 +19886,7 @@
 +			ipu_buf_free(ipu_buf[cnt].addr);
 +		}
 +	}
-+	else {			
++	else {
 +		ipu_buf_free(val);
 +	}
 +
@@ -19916,7 +19916,7 @@
 +
 +static unsigned int allocated_phys_addr = 0;
 +
-+/* 
++/*
 + * Allocated buffer list
 + */
 +typedef struct imem_list {
@@ -20124,7 +20124,7 @@
 +		/* allocate 2^val pages */
 +		imem_alloc(val);
 +	}
-+	else {			
++	else {
 +		/* free buffer which phys_addr is val */
 +		imem_free(val);
 +	}
@@ -20219,7 +20219,7 @@
 +		/* Convert to physical address */
 +		jz_imem_base = virt_to_phys((void *)jz_imem_base);
 +
-+		printk("Total %dMB memory at 0x%x was reserved for IPU\n", 
++		printk("Total %dMB memory at 0x%x was reserved for IPU\n",
 +		       (unsigned int)((1 << IMEM_MAX_ORDER) * PAGE_SIZE)/1000000, jz_imem_base);
 +	}
 +#endif
@@ -20483,9 +20483,9 @@
 @@ -0,0 +1,182 @@
 +/*
 + * linux/arch/mips/jz4740/common/setup.c
-+ * 
++ *
 + * JZ4740 common setup routines.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + *
 + *  This program is free software; you can distribute it and/or modify it
@@ -20668,9 +20668,9 @@
 @@ -0,0 +1,158 @@
 +/*
 + * linux/arch/mips/jz4740/time.c
-+ * 
++ *
 + * Setting up the clock on the JZ4740 boards.
-+ * 
++ *
 + * Copyright (C) 2008 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -21012,7 +21012,7 @@
 +	/* CS2# */
 +	REG_GPIO_PXFUNS(1) = 0x04000000;
 +	REG_GPIO_PXSELC(1) = 0x04000000;
-+	
++
 +	__gpio_as_pcm();
 +}
 +
@@ -21098,7 +21098,7 @@
 +/*
 + * linux/arch/mips/jz4750/cpufreq.c
 + *
-+ * cpufreq driver for JZ4750 
++ * cpufreq driver for JZ4750
 + *
 + * Copyright (c) 2006-2008  Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
@@ -21171,7 +21171,7 @@
 +
 +static void jz_update_clocks(void)
 +{
-+	/* Next clocks must be updated if we have changed 
++	/* Next clocks must be updated if we have changed
 +	 * the PLL or divisors.
 +	 */
 +	jz_clocks.cclk = __cpm_get_cclk();
@@ -21199,7 +21199,7 @@
 +		/* the first time to scale frequencies */
 +		unsigned int dmcr, rtcor;
 +		unsigned int tras, rcd, tpc, trwl, trc;
-+		
++
 +		dmcr = REG_EMC_DMCR;
 +		rtcor = REG_EMC_RTCOR;
 +
@@ -21224,7 +21224,7 @@
 +static void jz_update_dram_rtcor(unsigned int new_mclk)
 +{
 +	unsigned int rtcor;
-+	
++
 +	new_mclk /= 1000;
 +	rtcor = boot_config.rtcor * new_mclk / boot_config.mclk;
 +	rtcor--;
@@ -21288,10 +21288,10 @@
 +
 +	trc = (trc < 1) ? 1: trc;
 +	trc = (trc > 15) ? 15: trc;
-+	trc /= 2;	
++	trc /= 2;
 +
 +	dmcr = REG_EMC_DMCR;
-+	
++
 +	dmcr &= ~(EMC_DMCR_TRAS_MASK | EMC_DMCR_RCD_MASK | EMC_DMCR_TPC_MASK | EMC_DMCR_TRWL_MASK | EMC_DMCR_TRC_MASK);
 +	dmcr |= ((tras << EMC_DMCR_TRAS_BIT) | (rcd << EMC_DMCR_RCD_BIT) | (tpc << EMC_DMCR_TPC_BIT) | (trwl << EMC_DMCR_TRWL_BIT) | (trc << EMC_DMCR_TRC_BIT));
 +
@@ -21299,7 +21299,7 @@
 +}
 +
 +static void jz_update_dram_prev(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so first update TRAS, RCD, TPC, TRWL
@@ -21315,11 +21315,11 @@
 +}
 +
 +static void jz_update_dram_post(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so update RTCOR
-+		 * after changing the frequency 
++		 * after changing the frequency
 +		 */
 +		jz_update_dram_rtcor(new_mclk);
 +	} else {
@@ -21335,7 +21335,7 @@
 +	unsigned int cpccr;
 +	unsigned int cur_mclk, new_mclk;
 +	int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	cpccr = REG_CPM_CPCCR;
 +	cpccr &= ~((unsigned long)regs->cpccr_mask);
@@ -21374,10 +21374,10 @@
 +#ifdef CHANGE_PLL
 +/* Maintain the LCD clock and pixel clock */
 +static void jz_scale_lcd_divisors(struct dpm_regs *regs)
-+{	
++{
 +	unsigned int new_pll, new_lcd_div, new_lcdpix_div;
 +	unsigned int cpccr;
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	if (!boot_config.lcd_clks_initialized) return;
 +
@@ -21444,7 +21444,7 @@
 +	 */
 +	jz_update_dram_prev(cur_mclk, new_mclk);
 +
-+	/* 
++	/*
 +	 * Update PLL, align code to cache line.
 +	 */
 +	cppcr |= CPM_CPPCR_PLLEN;
@@ -21476,9 +21476,9 @@
 +	jz_init_boot_config();
 +
 +#ifdef CHANGE_PLL
-+	/* 
++	/*
 +	 * Disable LCD before scaling pll.
-+	 * LCD and LCD pixel clocks should not be changed even if the PLL 
++	 * LCD and LCD pixel clocks should not be changed even if the PLL
 +	 * output frequency has been changed.
 +	 */
 +	REG_LCD_CTRL &= ~LCD_CTRL_ENA;
@@ -21577,9 +21577,9 @@
 +
 +	dprintk("divisors of I:S:P:M = %d:%d:%d:%d\n", div[0], div[1], div[2], div[3]);
 +
-+	regs->cpccr = 
-+		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) | 
-+		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) | 
++	regs->cpccr =
++		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) |
++		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) |
 +		(n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
 +		(n2FR[div[3]] << CPM_CPCCR_MDIV_BIT);
 +
@@ -21704,7 +21704,7 @@
 + *
 + * Support functions for the JZ4750 internal DMA channels.
 + * No-descriptor transfer only.
-+ * Descriptor transfer should also call jz_request_dma() to get a free 
++ * Descriptor transfer should also call jz_request_dma() to get a free
 + * channel and call jz_free_dma() to free the channel. And driver should
 + * build the DMA descriptor and setup the DMA channel by itself.
 + *
@@ -21878,9 +21878,9 @@
 +		return -EINVAL;
 +
 +        /* Because of a bug in DMA controller of jz4750, which causes auto
-+           request and device request can't be allocated in a same DMA 
-+           controller, all device requests should be put in the second DMA 
-+           controller 
++           request and device request can't be allocated in a same DMA
++           controller, all device requests should be put in the second DMA
++           controller
 +         */
 +	if (dev_id > DMA_ID_AUTO)
 +		chan0 = 6;
@@ -22217,7 +22217,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("oss_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -22251,7 +22251,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("alsa_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -22472,7 +22472,7 @@
 +	desc->dsadr = dma_src_phys_addr + 8192;	/* DMA source address */
 +	desc->dtadr = dma_dst_phys_addr + 8192;	/* DMA target address */
 +	desc->ddadr = (next << 24) + 256;    /* size: 256*16 bytes = 4096 bytes */
-+	
++
 +	desc++;
 +	next = (dma_desc_phys_addr + 4*(sizeof(jz_dma_desc))) >> 4;
 +
@@ -22540,9 +22540,9 @@
 @@ -0,0 +1,273 @@
 +/*
 + * linux/arch/mips/jz4750/i2c.c
-+ * 
++ *
 + * Jz4750 I2C routines.
-+ * 
++ *
 + * Copyright (C) 2005,2006 Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
 + *
@@ -23052,7 +23052,7 @@
 +		disable_intc_irq(i);
 +		irq_desc[i].chip = &intc_irq_type;
 +	}
-+	
++
 +	/* Set up DMAC irq
 +	 */
 +	for (i = 0; i < NUM_DMA; i++) {
@@ -23262,16 +23262,16 @@
 @@ -0,0 +1,461 @@
 +/*
 + * linux/arch/mips/jz4750/common/pm.c
-+ * 
++ *
 + * JZ4750 Power Management Routines
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
 + *  This program is free software; you can distribute it and/or modify it
 + *  under the terms of the GNU General Public License (Version 2) as
 + *  published by the Free Software Foundation.
-+ * 
++ *
 + *  This program is distributed in the hope it will be useful, but WITHOUT
 + *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 + *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
@@ -23280,7 +23280,7 @@
 + *  You should have received a copy of the GNU General Public License along
 + *  with this program; if not, write to the Free Software Foundation, Inc.,
 + *  59 Temple Place - Suite 330, Boston MA 02111-1307, USA.
-+ * 
++ *
 + */
 +
 +#include <linux/init.h>
@@ -23288,14 +23288,14 @@
 +#include <linux/pm_legacy.h>
 +#include <linux/sched.h>
 +#include <linux/interrupt.h>
-+#include <linux/proc_fs.h> 
++#include <linux/proc_fs.h>
 +#include <linux/sysctl.h>
 +
 +#include <asm/cacheops.h>
 +#include <asm/jzsoc.h>
 +
 +#undef DEBUG
-+//#define DEBUG 
++//#define DEBUG
 +#ifdef DEBUG
 +#define dprintk(x...)	printk(x)
 +#else
@@ -23304,9 +23304,9 @@
 +
 +#define GPIO_PORT_NUM   6
 +
-+/* 
++/*
 + * __gpio_as_sleep set all pins to pull-disable, and set all pins as input
-+ * except sdram and the pins which can be used as CS1_N to CS4_N for chip select. 
++ * except sdram and the pins which can be used as CS1_N to CS4_N for chip select.
 + */
 +#define __gpio_as_sleep()	              \
 +do {	                                      \
@@ -23339,8 +23339,8 @@
 +	/* Mask all interrupts */
 +	REG_INTC_IMSR = 0xffffffff;
 +
-+	/* 
-+	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled 
++	/*
++	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled
 +	 * through  RTC driver's ioctl (linux/driver/char/rtc_jz.c).
 +	 */
 +
@@ -23373,15 +23373,15 @@
 +
 +/* NOTES:
 + * 1: Pins that are floated (NC) should be set as input and pull-enable.
-+ * 2: Pins that are pull-up or pull-down by outside should be set as input 
++ * 2: Pins that are pull-up or pull-down by outside should be set as input
 + *    and pull-disable.
-+ * 3: Pins that are connected to a chip except sdram and nand flash 
++ * 3: Pins that are connected to a chip except sdram and nand flash
 + *    should be set as input and pull-disable, too.
 + */
 +static void jz_board_do_sleep(unsigned long *ptr)
 +{
 +	unsigned char i;
-+        
++
 +        /* Print messages of GPIO registers for debug */
 +	for(i=0;i<GPIO_PORT_NUM;i++) {
 +		dprintk("run dat:%x pin:%x fun:%x sel:%x dir:%x pull:%x msk:%x trg:%x\n",        \
@@ -23401,36 +23401,36 @@
 +	}
 +
 +        /*
-+         * Set all pins to pull-disable, and set all pins as input except 
-+         * sdram and the pins which can be used as CS1_N to CS4_N for chip select. 
++         * Set all pins to pull-disable, and set all pins as input except
++         * sdram and the pins which can be used as CS1_N to CS4_N for chip select.
 +         */
 +        __gpio_as_sleep();
 +
 +        /*
 +	 * Set proper status for GPC21 to GPC24 which can be used as CS1_N to CS4_N.
-+	 * Keep the pins' function used for chip select(CS) here according to your   
++	 * Keep the pins' function used for chip select(CS) here according to your
 +         * system to avoid chip select crashing with sdram when resuming from sleep mode.
 +         */
 +
 +#if defined(CONFIG_JZ4750_APUS)
-+        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */ 
++        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */
 +
 +        /* GPB26/CS2_N is connected to nand flash, needn't be changed. */
 +
 +        /* GPB28/CS3_N is used as cs8900's chip select, shouldn't be changed. */
-+ 
-+	/* GPB27/CS4_N is used as NOR's chip select, shouldn't be changed. */ 
++
++	/* GPB27/CS4_N is used as NOR's chip select, shouldn't be changed. */
 +#endif
 +
-+ 	/* 
-+         * Enable pull for NC pins here according to your system 
++ 	/*
++         * Enable pull for NC pins here according to your system
 +	 */
 +
 +#if defined(CONFIG_JZ4750_APUS)
 +#endif
 +
-+	/* 
-+         * If you must set some GPIOs as output to high level or low level,  
++	/*
++         * If you must set some GPIOs as output to high level or low level,
 +         * you can set them here, using:
 +         * __gpio_as_output(n);
 +         * __gpio_set_pin(n); or  __gpio_clear_pin(n);
@@ -23478,10 +23478,10 @@
 +
 +		 REG_GPIO_PXIMS(i)=*ptr;
 +		 REG_GPIO_PXIMC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXDATS(i)=*ptr;
 +		 REG_GPIO_PXDATC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXTRGS(i)=*ptr;
 +		 REG_GPIO_PXTRGC(i)=~(*ptr++);
 +	}
@@ -23497,7 +23497,7 @@
 +
 +
 +static int jz_pm_do_sleep(void)
-+{ 
++{
 +	unsigned long delta;
 +	unsigned long nfcsr = REG_EMC_NFCSR;
 +	unsigned long opcr = REG_CPM_OPCR;
@@ -23575,10 +23575,10 @@
 +	/* Restore interrupts */
 +	REG_INTC_IMSR = imr;
 +	REG_INTC_IMCR = ~imr;
-+	
++
 +	/* Restore sadc */
 +	REG_SADC_ENA = sadc;
-+	
++
 +	/* Resume on-board modules */
 +	jz_board_do_resume(sleep_gpio_save);
 +
@@ -23653,7 +23653,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/suspend invokes this function 
++ * A write to /proc/sys/pm/suspend invokes this function
 + * which initiates a sleep.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_sleep(void)
@@ -23664,7 +23664,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/hibernate invokes this function 
++ * A write to /proc/sys/pm/hibernate invokes this function
 + * which initiates a poweroff.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_hibernate(void)
@@ -23726,9 +23726,9 @@
 @@ -0,0 +1,905 @@
 +/*
 + * linux/arch/mips/jz4750/proc.c
-+ * 
++ *
 + * /proc/jz/ procfs for jz4750 on-chip modules.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -23780,7 +23780,7 @@
 +	return len;
 +}
 +
-+/* 
++/*
 + * Power Manager Module
 + */
 +static int pmc_read_proc (char *page, char **start, off_t off,
@@ -23790,11 +23790,11 @@
 +	unsigned long lcr = REG_CPM_LCR;
 +	unsigned long clkgr = REG_CPM_CLKGR;
 +
-+	len += sprintf (page+len, "Low Power Mode : %s\n", 
++	len += sprintf (page+len, "Low Power Mode : %s\n",
 +			((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_IDLE)) ?
-+			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ? 
++			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ?
 +				  "SLEEP" : "HIBERNATE"));
-+	len += sprintf (page+len, "Doze Mode      : %s\n", 
++	len += sprintf (page+len, "Doze Mode      : %s\n",
 +			(lcr & CPM_LCR_DOZE_ON) ? "on" : "off");
 +	if (lcr & CPM_LCR_DOZE_ON)
 +		len += sprintf (page+len, "     duty      : %d\n", (int)((lcr & CPM_LCR_DOZE_DUTY_MASK) >> CPM_LCR_DOZE_DUTY_BIT));
@@ -23860,14 +23860,14 @@
 +
 +	len += sprintf (page+len, "CPPCR          : 0x%08x\n", cppcr);
 +	len += sprintf (page+len, "CPCCR          : 0x%08x\n", cpccr);
-+	len += sprintf (page+len, "PLL            : %s\n", 
++	len += sprintf (page+len, "PLL            : %s\n",
 +			(cppcr & CPM_CPPCR_PLLEN) ? "ON" : "OFF");
 +	len += sprintf (page+len, "m:n:o          : %d:%d:%d\n",
 +			__cpm_get_pllm() + 2,
 +			__cpm_get_plln() + 2,
 +			od[__cpm_get_pllod()]
 +		);
-+	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n", 
++	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n",
 +			div[__cpm_get_cdiv()],
 +			div[__cpm_get_hdiv()],
 +			div[__cpm_get_mdiv()],
@@ -23898,12 +23898,12 @@
 +}
 +
 +
-+/* USAGE:  
++/* USAGE:
 + * echo n  > /proc/jz/ipu 	// n = [1,...,9], alloc mem, 2^n pages.
 + * echo FF > /proc/jz/ipu 	// 255, free all buffer
 + * echo xxxx > /proc/jz/ipu 	// free buffer which addr is xxxx
 + * echo llll > /proc/jz/ipu 	// add_wired_entry(l,l,l,l)
-+ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf 
++ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf
 + * od -X /proc/jz/ipu 		// read mem addr
 + */
 +
@@ -23986,7 +23986,7 @@
 +		if (p->pid == pid )
 +			g_asid = p->mm->context[0];
 +	} while_each_thread(g, p);
-+	
++
 +	local_irq_save(flags);
 +	/* Save old context and create impossible VPN2 value */
 +	old_ctx = read_c0_entryhi() & 0xff;
@@ -24020,8 +24020,8 @@
 +
 +static void ipu_del_wired_entry( void )
 +{
-+	unsigned long flags;	
-+	unsigned long wired;	
++	unsigned long flags;
++	unsigned long wired;
 +
 +	local_irq_save(flags);
 +	wired = read_c0_wired();
@@ -24067,11 +24067,11 @@
 +	unsigned char * virt_addr, *addr;
 +	int cnt, i;
 +
-+	if ( phys_addr == 0 ) 
++	if ( phys_addr == 0 )
 +		return ;
 +
-+	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt ) 
-+		if ( phys_addr == ipu_buf[cnt].addr ) 
++	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt )
++		if ( phys_addr == ipu_buf[cnt].addr )
 +			break;
 +
 +	if ( cnt == IPU_BUF_MAX ) {	/* addr not in the ipu buffers */
@@ -24114,7 +24114,7 @@
 +		printk("no free buffer.\n");
 +		*pint = 0;
 +	}
-+	else 
++	else
 +		*pint = (unsigned int )ipu_buf[ipu_buf_cnt].addr; /* phys addr */
 +	len += sizeof(unsigned int);
 +
@@ -24135,31 +24135,31 @@
 +	printk("ipu write count=%u\n", count);
 +#endif
 +	if (count == 41) {
-+		for (i=0;i<12;i++) 
++		for (i=0;i<12;i++)
 +			buf[i]=0;
 +		strncpy(buf, buffer+8*0, 8);
 +		pid = simple_strtoul(buf, 0, 16);
-+		for (i=0;i<12;i++) 
++		for (i=0;i<12;i++)
 +			buf[i]=0;
 +		strncpy(buf, buffer+8*1, 8);
 +		entrylo0 = simple_strtoul(buf, 0, 16);
-+		for (i=0;i<12;i++) 
++		for (i=0;i<12;i++)
 +			buf[i]=0;
 +		strncpy(buf, buffer+8*2, 8);
 +		entrylo1 = simple_strtoul(buf, 0, 16);
-+		for (i=0;i<12;i++) 
++		for (i=0;i<12;i++)
 +			buf[i]=0;
 +		strncpy(buf, buffer+8*3, 8);
 +		entryhi = simple_strtoul(buf, 0, 16);
-+		for (i=0;i<12;i++) 
++		for (i=0;i<12;i++)
 +			buf[i]=0;
 +		strncpy(buf, buffer+8*4, 8);
 +		pagemask = simple_strtoul(buf, 0, 16);
-+		
-+#if defined(DEBUG)		
-+		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n", 
++
++#if defined(DEBUG)
++		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n",
 +		       pid, entrylo0, entrylo1, entryhi, pagemask);
-+#endif		
++#endif
 +		ipu_add_wired_entry( pid, entrylo0, entrylo1, entryhi, pagemask);
 +		return 41;
 +	} else if ( count <= 9 ) {
@@ -24167,22 +24167,22 @@
 +		strncpy(buf, buffer, 8);
 +		val = simple_strtoul(buf, 0, 16);
 +	} else if (count == 44) {
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer, 10);
 +		pid = simple_strtoul(buf, 0, 16);
 +
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 11, 10);
 +		entryhi = simple_strtoul(buf, 0, 16);//vaddr
 +
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 22, 10);
 +		entrylo0 = simple_strtoul(buf, 0, 16);//paddr
 +
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 33, 10);
 +		pagemask = simple_strtoul(buf, 0, 16);
@@ -24202,8 +24202,8 @@
 +
 +	/* val: 1-9, page_shift,  val>= 10: ipu_buf.addr */
 +	if ( val == 0 ) {	/* debug, print ipu_buf info */
-+		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt) 
-+			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n", 
++		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt)
++			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n",
 +			       cnt, ipu_buf[cnt].addr, ipu_buf[cnt].page_shift );
 +#if defined(DEBUG)
 +		show_tlb();
@@ -24217,7 +24217,7 @@
 +			ipu_buf_free(ipu_buf[cnt].addr);
 +		}
 +	}
-+	else {			
++	else {
 +		ipu_buf_free(val);
 +	}
 +
@@ -24264,7 +24264,7 @@
 +
 +		len += sprintf (page+len, "REMOVE\n");
 +	}
-+                                                                                                               
++
 +        return len;
 +}
 +
@@ -24316,7 +24316,7 @@
 +
 +static unsigned int allocated_phys_addr = 0;
 +
-+/* 
++/*
 + * Allocated buffer list
 + */
 +typedef struct imem_list {
@@ -24522,7 +24522,7 @@
 +	} else if ((val >= 0) && (val <= IMEM_MAX_ORDER)) {
 +		/* allocate 2^val pages */
 +		imem_alloc(val);
-+	} else {			
++	} else {
 +		/* free buffer which phys_addr is val */
 +		imem_free(val);
 +	}
@@ -24620,7 +24620,7 @@
 +		/* Convert to physical address */
 +		jz_imem_base = virt_to_phys((void *)jz_imem_base);
 +
-+		printk("Total %dMB memory at 0x%x was reserved for IPU\n", 
++		printk("Total %dMB memory at 0x%x was reserved for IPU\n",
 +		       (unsigned int)((1 << IMEM_MAX_ORDER) * PAGE_SIZE)/1000000, jz_imem_base);
 +	} else
 +		printk("NOT enough memory for imem\n");
@@ -24884,9 +24884,9 @@
 @@ -0,0 +1,197 @@
 +/*
 + * linux/arch/mips/jz4750/common/setup.c
-+ * 
++ *
 + * JZ4750 common setup routines.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + *
 + *  This program is free software; you can distribute it and/or modify it
@@ -25084,9 +25084,9 @@
 @@ -0,0 +1,156 @@
 +/*
 + * linux/arch/mips/jz4750/time.c
-+ * 
++ *
 + * Setting up the clock on the JZ4750 boards.
-+ * 
++ *
 + * Copyright (C) 2008 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -25344,7 +25344,7 @@
 +/*
 + * linux/arch/mips/jz4750d/cpufreq.c
 + *
-+ * cpufreq driver for JZ4750D 
++ * cpufreq driver for JZ4750D
 + *
 + * Copyright (c) 2006-2008  Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
@@ -25417,7 +25417,7 @@
 +
 +static void jz_update_clocks(void)
 +{
-+	/* Next clocks must be updated if we have changed 
++	/* Next clocks must be updated if we have changed
 +	 * the PLL or divisors.
 +	 */
 +	jz_clocks.cclk = __cpm_get_cclk();
@@ -25445,7 +25445,7 @@
 +		/* the first time to scale frequencies */
 +		unsigned int dmcr, rtcor;
 +		unsigned int tras, rcd, tpc, trwl, trc;
-+		
++
 +		dmcr = REG_EMC_DMCR;
 +		rtcor = REG_EMC_RTCOR;
 +
@@ -25470,7 +25470,7 @@
 +static void jz_update_dram_rtcor(unsigned int new_mclk)
 +{
 +	unsigned int rtcor;
-+	
++
 +	new_mclk /= 1000;
 +	rtcor = boot_config.rtcor * new_mclk / boot_config.mclk;
 +	rtcor--;
@@ -25534,10 +25534,10 @@
 +
 +	trc = (trc < 1) ? 1: trc;
 +	trc = (trc > 15) ? 15: trc;
-+	trc /= 2;	
++	trc /= 2;
 +
 +	dmcr = REG_EMC_DMCR;
-+	
++
 +	dmcr &= ~(EMC_DMCR_TRAS_MASK | EMC_DMCR_RCD_MASK | EMC_DMCR_TPC_MASK | EMC_DMCR_TRWL_MASK | EMC_DMCR_TRC_MASK);
 +	dmcr |= ((tras << EMC_DMCR_TRAS_BIT) | (rcd << EMC_DMCR_RCD_BIT) | (tpc << EMC_DMCR_TPC_BIT) | (trwl << EMC_DMCR_TRWL_BIT) | (trc << EMC_DMCR_TRC_BIT));
 +
@@ -25545,7 +25545,7 @@
 +}
 +
 +static void jz_update_dram_prev(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so first update TRAS, RCD, TPC, TRWL
@@ -25561,11 +25561,11 @@
 +}
 +
 +static void jz_update_dram_post(unsigned int cur_mclk, unsigned int new_mclk)
-+{	
++{
 +	/* No risk, no fun: run with interrupts on! */
 +	if (new_mclk > cur_mclk) {
 +		/* We're going FASTER, so update RTCOR
-+		 * after changing the frequency 
++		 * after changing the frequency
 +		 */
 +		jz_update_dram_rtcor(new_mclk);
 +	} else {
@@ -25581,7 +25581,7 @@
 +	unsigned int cpccr;
 +	unsigned int cur_mclk, new_mclk;
 +	int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	cpccr = REG_CPM_CPCCR;
 +	cpccr &= ~((unsigned long)regs->cpccr_mask);
@@ -25620,10 +25620,10 @@
 +#ifdef CHANGE_PLL
 +/* Maintain the LCD clock and pixel clock */
 +static void jz_scale_lcd_divisors(struct dpm_regs *regs)
-+{	
++{
 +	unsigned int new_pll, new_lcd_div, new_lcdpix_div;
 +	unsigned int cpccr;
-+	unsigned int tmp = 0, wait = PLL_WAIT_500NS; 
++	unsigned int tmp = 0, wait = PLL_WAIT_500NS;
 +
 +	if (!boot_config.lcd_clks_initialized) return;
 +
@@ -25690,7 +25690,7 @@
 +	 */
 +	jz_update_dram_prev(cur_mclk, new_mclk);
 +
-+	/* 
++	/*
 +	 * Update PLL, align code to cache line.
 +	 */
 +	cppcr |= CPM_CPPCR_PLLEN;
@@ -25722,9 +25722,9 @@
 +	jz_init_boot_config();
 +
 +#ifdef CHANGE_PLL
-+	/* 
++	/*
 +	 * Disable LCD before scaling pll.
-+	 * LCD and LCD pixel clocks should not be changed even if the PLL 
++	 * LCD and LCD pixel clocks should not be changed even if the PLL
 +	 * output frequency has been changed.
 +	 */
 +	REG_LCD_CTRL &= ~LCD_CTRL_ENA;
@@ -25823,9 +25823,9 @@
 +
 +	dprintk("divisors of I:S:P:M = %d:%d:%d:%d\n", div[0], div[1], div[2], div[3]);
 +
-+	regs->cpccr = 
-+		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) | 
-+		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) | 
++	regs->cpccr =
++		(n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) |
++		(n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) |
 +		(n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
 +		(n2FR[div[3]] << CPM_CPCCR_MDIV_BIT);
 +
@@ -25950,7 +25950,7 @@
 + *
 + * Support functions for the JZ4750D internal DMA channels.
 + * No-descriptor transfer only.
-+ * Descriptor transfer should also call jz_request_dma() to get a free 
++ * Descriptor transfer should also call jz_request_dma() to get a free
 + * channel and call jz_free_dma() to free the channel. And driver should
 + * build the DMA descriptor and setup the DMA channel by itself.
 + *
@@ -26449,7 +26449,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("oss_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -26483,7 +26483,7 @@
 +			chan->mode &= ~DMAC_DCMD_DAI;
 +		} else
 +			printk("alsa_dma_burst_mode() just supports DMA_MODE_READ or DMA_MODE_WRITE!\n");
-+		
++
 +		REG_DMAC_DCMD(chan->io) = chan->mode & ~DMA_MODE_MASK;
 +		REG_DMAC_DRSR(chan->io) = chan->source;
 +		break;
@@ -26704,7 +26704,7 @@
 +	desc->dsadr = dma_src_phys_addr + 8192;	/* DMA source address */
 +	desc->dtadr = dma_dst_phys_addr + 8192;	/* DMA target address */
 +	desc->ddadr = (next << 24) + 256;    /* size: 256*16 bytes = 4096 bytes */
-+	
++
 +	desc++;
 +	next = (dma_desc_phys_addr + 4*(sizeof(jz_dma_desc))) >> 4;
 +
@@ -26772,9 +26772,9 @@
 @@ -0,0 +1,273 @@
 +/*
 + * linux/arch/mips/jz4750d/i2c.c
-+ * 
++ *
 + * Jz4750D I2C routines.
-+ * 
++ *
 + * Copyright (C) 2005,2006 Ingenic Semiconductor Inc.
 + * Author: <lhhuang@ingenic.cn>
 + *
@@ -27284,7 +27284,7 @@
 +		disable_intc_irq(i);
 +		irq_desc[i].chip = &intc_irq_type;
 +	}
-+	
++
 +	/* Set up DMAC irq
 +	 */
 +	for (i = 0; i < NUM_DMA; i++) {
@@ -27494,16 +27494,16 @@
 @@ -0,0 +1,461 @@
 +/*
 + * linux/arch/mips/jz4750d/common/pm.c
-+ * 
++ *
 + * JZ4750D Power Management Routines
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
 + *  This program is free software; you can distribute it and/or modify it
 + *  under the terms of the GNU General Public License (Version 2) as
 + *  published by the Free Software Foundation.
-+ * 
++ *
 + *  This program is distributed in the hope it will be useful, but WITHOUT
 + *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 + *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
@@ -27512,7 +27512,7 @@
 + *  You should have received a copy of the GNU General Public License along
 + *  with this program; if not, write to the Free Software Foundation, Inc.,
 + *  59 Temple Place - Suite 330, Boston MA 02111-1307, USA.
-+ * 
++ *
 + */
 +
 +#include <linux/init.h>
@@ -27520,14 +27520,14 @@
 +#include <linux/pm_legacy.h>
 +#include <linux/sched.h>
 +#include <linux/interrupt.h>
-+#include <linux/proc_fs.h> 
++#include <linux/proc_fs.h>
 +#include <linux/sysctl.h>
 +
 +#include <asm/cacheops.h>
 +#include <asm/jzsoc.h>
 +
 +#undef DEBUG
-+//#define DEBUG 
++//#define DEBUG
 +#ifdef DEBUG
 +#define dprintk(x...)	printk(x)
 +#else
@@ -27536,9 +27536,9 @@
 +
 +#define GPIO_PORT_NUM   6
 +
-+/* 
++/*
 + * __gpio_as_sleep set all pins to pull-disable, and set all pins as input
-+ * except sdram and the pins which can be used as CS1_N to CS4_N for chip select. 
++ * except sdram and the pins which can be used as CS1_N to CS4_N for chip select.
 + */
 +#define __gpio_as_sleep()	              \
 +do {	                                      \
@@ -27571,8 +27571,8 @@
 +	/* Mask all interrupts */
 +	REG_INTC_IMSR = 0xffffffff;
 +
-+	/* 
-+	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled 
++	/*
++	 * RTC Wakeup or 1Hz interrupt can be enabled or disabled
 +	 * through  RTC driver's ioctl (linux/driver/char/rtc_jz.c).
 +	 */
 +
@@ -27605,15 +27605,15 @@
 +
 +/* NOTES:
 + * 1: Pins that are floated (NC) should be set as input and pull-enable.
-+ * 2: Pins that are pull-up or pull-down by outside should be set as input 
++ * 2: Pins that are pull-up or pull-down by outside should be set as input
 + *    and pull-disable.
-+ * 3: Pins that are connected to a chip except sdram and nand flash 
++ * 3: Pins that are connected to a chip except sdram and nand flash
 + *    should be set as input and pull-disable, too.
 + */
 +static void jz_board_do_sleep(unsigned long *ptr)
 +{
 +	unsigned char i;
-+        
++
 +        /* Print messages of GPIO registers for debug */
 +	for(i=0;i<GPIO_PORT_NUM;i++) {
 +		dprintk("run dat:%x pin:%x fun:%x sel:%x dir:%x pull:%x msk:%x trg:%x\n",        \
@@ -27633,36 +27633,36 @@
 +	}
 +
 +        /*
-+         * Set all pins to pull-disable, and set all pins as input except 
-+         * sdram and the pins which can be used as CS1_N to CS4_N for chip select. 
++         * Set all pins to pull-disable, and set all pins as input except
++         * sdram and the pins which can be used as CS1_N to CS4_N for chip select.
 +         */
 +        __gpio_as_sleep();
 +
 +        /*
 +	 * Set proper status for GPC21 to GPC24 which can be used as CS1_N to CS4_N.
-+	 * Keep the pins' function used for chip select(CS) here according to your   
++	 * Keep the pins' function used for chip select(CS) here according to your
 +         * system to avoid chip select crashing with sdram when resuming from sleep mode.
 +         */
 +
 +#if defined(CONFIG_JZ4750D_APUS)
-+        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */ 
++        /* GPB25/CS1_N is used as chip select for nand flash, shouldn't be change. */
 +
 +        /* GPB26/CS2_N is connected to nand flash, needn't be changed. */
 +
 +        /* GPB28/CS3_N is used as cs8900's chip select, shouldn't be changed. */
-+ 
-+	/* GPB27/CS4_N is used as NOR's chip select, shouldn't be changed. */ 
++
++	/* GPB27/CS4_N is used as NOR's chip select, shouldn't be changed. */
 +#endif
 +
-+ 	/* 
-+         * Enable pull for NC pins here according to your system 
++ 	/*
++         * Enable pull for NC pins here according to your system
 +	 */
 +
 +#if defined(CONFIG_JZ4750D_APUS)
 +#endif
 +
-+	/* 
-+         * If you must set some GPIOs as output to high level or low level,  
++	/*
++         * If you must set some GPIOs as output to high level or low level,
 +         * you can set them here, using:
 +         * __gpio_as_output(n);
 +         * __gpio_set_pin(n); or  __gpio_clear_pin(n);
@@ -27710,10 +27710,10 @@
 +
 +		 REG_GPIO_PXIMS(i)=*ptr;
 +		 REG_GPIO_PXIMC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXDATS(i)=*ptr;
 +		 REG_GPIO_PXDATC(i)=~(*ptr++);
-+	
++
 +		 REG_GPIO_PXTRGS(i)=*ptr;
 +		 REG_GPIO_PXTRGC(i)=~(*ptr++);
 +	}
@@ -27729,7 +27729,7 @@
 +
 +
 +static int jz_pm_do_sleep(void)
-+{ 
++{
 +	unsigned long delta;
 +	unsigned long nfcsr = REG_EMC_NFCSR;
 +	unsigned long opcr = REG_CPM_OPCR;
@@ -27807,10 +27807,10 @@
 +	/* Restore interrupts */
 +	REG_INTC_IMSR = imr;
 +	REG_INTC_IMCR = ~imr;
-+	
++
 +	/* Restore sadc */
 +	REG_SADC_ENA = sadc;
-+	
++
 +	/* Resume on-board modules */
 +	jz_board_do_resume(sleep_gpio_save);
 +
@@ -27885,7 +27885,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/suspend invokes this function 
++ * A write to /proc/sys/pm/suspend invokes this function
 + * which initiates a sleep.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_sleep(void)
@@ -27896,7 +27896,7 @@
 +/*----------------------------------------------------------------------------
 + * Power Management sleep sysctl proc interface
 + *
-+ * A write to /proc/sys/pm/hibernate invokes this function 
++ * A write to /proc/sys/pm/hibernate invokes this function
 + * which initiates a poweroff.
 + *--------------------------------------------------------------------------*/
 +static int sysctl_jz_pm_hibernate(void)
@@ -27958,9 +27958,9 @@
 @@ -0,0 +1,877 @@
 +/*
 + * linux/arch/mips/jz4750d/proc.c
-+ * 
++ *
 + * /proc/jz/ procfs for jz4750d on-chip modules.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -28012,7 +28012,7 @@
 +	return len;
 +}
 +
-+/* 
++/*
 + * Power Manager Module
 + */
 +static int pmc_read_proc (char *page, char **start, off_t off,
@@ -28022,11 +28022,11 @@
 +	unsigned long lcr = REG_CPM_LCR;
 +	unsigned long clkgr = REG_CPM_CLKGR;
 +
-+	len += sprintf (page+len, "Low Power Mode : %s\n", 
++	len += sprintf (page+len, "Low Power Mode : %s\n",
 +			((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_IDLE)) ?
-+			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ? 
++			"IDLE" : (((lcr & CPM_LCR_LPM_MASK) == (CPM_LCR_LPM_SLEEP)) ?
 +				  "SLEEP" : "HIBERNATE"));
-+	len += sprintf (page+len, "Doze Mode      : %s\n", 
++	len += sprintf (page+len, "Doze Mode      : %s\n",
 +			(lcr & CPM_LCR_DOZE_ON) ? "on" : "off");
 +	if (lcr & CPM_LCR_DOZE_ON)
 +		len += sprintf (page+len, "     duty      : %d\n", (int)((lcr & CPM_LCR_DOZE_DUTY_MASK) >> CPM_LCR_DOZE_DUTY_BIT));
@@ -28092,14 +28092,14 @@
 +
 +	len += sprintf (page+len, "CPPCR          : 0x%08x\n", cppcr);
 +	len += sprintf (page+len, "CPCCR          : 0x%08x\n", cpccr);
-+	len += sprintf (page+len, "PLL            : %s\n", 
++	len += sprintf (page+len, "PLL            : %s\n",
 +			(cppcr & CPM_CPPCR_PLLEN) ? "ON" : "OFF");
 +	len += sprintf (page+len, "m:n:o          : %d:%d:%d\n",
 +			__cpm_get_pllm() + 2,
 +			__cpm_get_plln() + 2,
 +			od[__cpm_get_pllod()]
 +		);
-+	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n", 
++	len += sprintf (page+len, "C:H:M:P        : %d:%d:%d:%d\n",
 +			div[__cpm_get_cdiv()],
 +			div[__cpm_get_hdiv()],
 +			div[__cpm_get_mdiv()],
@@ -28130,12 +28130,12 @@
 +}
 +
 +
-+/* USAGE:  
++/* USAGE:
 + * echo n  > /proc/jz/ipu 	// n = [1,...,9], alloc mem, 2^n pages.
 + * echo FF > /proc/jz/ipu 	// 255, free all buffer
 + * echo xxxx > /proc/jz/ipu 	// free buffer which addr is xxxx
 + * echo llll > /proc/jz/ipu 	// add_wired_entry(l,l,l,l)
-+ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf 
++ * echo 0  > /proc/jz/ipu 	// debug, print ipu_buf
 + * od -X /proc/jz/ipu 		// read mem addr
 + */
 +
@@ -28217,7 +28217,7 @@
 +		if (p->pid == pid )
 +			g_asid = p->mm->context[0];
 +	} while_each_thread(g, p);
-+	
++
 +
 +	local_irq_save(flags);
 +
@@ -28256,8 +28256,8 @@
 +
 +static void ipu_del_wired_entry( void )
 +{
-+	unsigned long flags;	
-+	unsigned long wired;	
++	unsigned long flags;
++	unsigned long wired;
 +
 +	local_irq_save(flags);
 +	wired = read_c0_wired();
@@ -28303,11 +28303,11 @@
 +	unsigned char * virt_addr, *addr;
 +	int cnt, i;
 +
-+	if ( phys_addr == 0 ) 
++	if ( phys_addr == 0 )
 +		return ;
 +
-+	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt ) 
-+		if ( phys_addr == ipu_buf[cnt].addr ) 
++	for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt )
++		if ( phys_addr == ipu_buf[cnt].addr )
 +			break;
 +
 +	if ( cnt == IPU_BUF_MAX ) {	/* addr not in the ipu buffers */
@@ -28343,7 +28343,7 @@
 +		printk("no free buffer.\n");
 +		*pint = 0;
 +	}
-+	else 
++	else
 +		*pint = (unsigned int )ipu_buf[ipu_buf_cnt].addr; /* phys addr */
 +	len += sizeof(unsigned int);
 +
@@ -28379,11 +28379,11 @@
 +		for (i=0;i<12;i++) buf[i]=0;
 +		strncpy(buf, buffer+8*4, 8);
 +		pagemask = simple_strtoul(buf, 0, 16);
-+		
-+#if defined(DEBUG)		
-+		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n", 
++
++#if defined(DEBUG)
++		printk("pid=0x%08x, entrylo0=0x%08x, entrylo1=0x%08x, entryhi=0x%08x, pagemask=0x%08x\n",
 +		       pid, entrylo0, entrylo1, entryhi, pagemask);
-+#endif		
++#endif
 +		ipu_add_wired_entry( pid, entrylo0, entrylo1, entryhi, pagemask);
 +		return 41;
 +	}
@@ -28392,19 +28392,19 @@
 +		strncpy(buf, buffer, 8);
 +		val = simple_strtoul(buf, 0, 16);
 +	} else if (count == 44) {
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer, 10);
 +		pid = simple_strtoul(buf, 0, 16);
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 11, 10);
 +		entryhi = simple_strtoul(buf, 0, 16);//vaddr
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 22, 10);
 +		entrylo0 = simple_strtoul(buf, 0, 16);//paddr
-+		for (i = 0; i < 12; i++) 
++		for (i = 0; i < 12; i++)
 +			buf[i] = 0;
 +		strncpy(buf, buffer + 33, 10);
 +		pagemask = simple_strtoul(buf, 0, 16);
@@ -28418,8 +28418,8 @@
 +
 +	/* val: 1-9, page_shift,  val>= 10: ipu_buf.addr */
 +	if ( val == 0 ) {	/* debug, print ipu_buf info */
-+		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt) 
-+			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n", 
++		for ( cnt=0; cnt<IPU_BUF_MAX; ++cnt)
++			printk("ipu_buf[%d]: addr=0x%08x, page_shift=%d\n",
 +			       cnt, ipu_buf[cnt].addr, ipu_buf[cnt].page_shift );
 +#if defined(DEBUG)
 +		show_tlb();
@@ -28433,7 +28433,7 @@
 +			ipu_buf_free(ipu_buf[cnt].addr);
 +		}
 +	}
-+	else {			
++	else {
 +		ipu_buf_free(val);
 +	}
 +
@@ -28480,7 +28480,7 @@
 +
 +		len += sprintf (page+len, "REMOVE\n");
 +	}
-+                                                                                                               
++
 +        return len;
 +}
 +
@@ -28528,7 +28528,7 @@
 +
 +static unsigned int allocated_phys_addr = 0;
 +
-+/* 
++/*
 + * Allocated buffer list
 + */
 +typedef struct imem_list {
@@ -28735,7 +28735,7 @@
 +		/* allocate 2^val pages */
 +		imem_alloc(val);
 +	}
-+	else {			
++	else {
 +		/* free buffer which phys_addr is val */
 +		imem_free(val);
 +	}
@@ -28825,7 +28825,7 @@
 +		/* Convert to physical address */
 +		jz_imem_base = virt_to_phys((void *)jz_imem_base);
 +
-+		printk("Total %dMB memory at 0x%x was reserved for IPU\n", 
++		printk("Total %dMB memory at 0x%x was reserved for IPU\n",
 +		       (unsigned int)((1 << IMEM_MAX_ORDER) * PAGE_SIZE)/1000000, jz_imem_base);
 +	}
 +
@@ -29088,9 +29088,9 @@
 @@ -0,0 +1,199 @@
 +/*
 + * linux/arch/mips/jz4750d/common/setup.c
-+ * 
++ *
 + * JZ4750D common setup routines.
-+ * 
++ *
 + * Copyright (C) 2006 Ingenic Semiconductor Inc.
 + *
 + *  This program is free software; you can distribute it and/or modify it
@@ -29290,9 +29290,9 @@
 @@ -0,0 +1,156 @@
 +/*
 + * linux/arch/mips/jz4750d/time.c
-+ * 
++ *
 + * Setting up the clock on the JZ4750D boards.
-+ * 
++ *
 + * Copyright (C) 2008 Ingenic Semiconductor Inc.
 + * Author: <jlwei@ingenic.cn>
 + *
@@ -29453,11 +29453,11 @@
 +	case CPU_JZRISC:
  		cpu_wait = r4k_wait;
  		break;
- 
-@@ -802,6 +803,22 @@
- 	}
+
+@@ -860,6 +860,23 @@
+	}
  }
- 
+
 +static inline void cpu_probe_ingenic(struct cpuinfo_mips *c)
 +{
 +	decode_configs(c);
@@ -29467,6 +29467,7 @@
 +		c->cputype = CPU_JZRISC;
 +		c->isa_level = MIPS_CPU_ISA_M32R1;
 +		c->tlbsize = 32;
++		__cpu_name[cpu] = "Ingenic JZRISC";
 +		break;
 +	default:
 +		panic("Unknown Ingenic Processor ID!");
@@ -29474,33 +29475,25 @@
 +	}
 +}
 +
- const char *__cpu_name[NR_CPUS];
- 
- /*
-@@ -880,6 +897,7 @@
- 	case CPU_BCM4710:	name = "Broadcom BCM4710"; break;
- 	case CPU_PR4450:	name = "Philips PR4450"; break;
- 	case CPU_LOONGSON2:	name = "ICT Loongson-2"; break;
-+	case CPU_JZRISC:	name = "Ingenic JZRISC"; break;
- 	default:
- 		BUG();
- 	}
-@@ -919,6 +937,9 @@
-  	case PRID_COMP_PHILIPS:
- 		cpu_probe_philips(c);
- 		break;
-+ 	case PRID_COMP_INGENIC:
+ static inline void cpu_probe_broadcom(struct cpuinfo_mips *c, unsigned int cpu)
+ {
+	decode_configs(c);
+@@ -909,6 +926,9 @@
+	case PRID_COMP_NXP:
+		cpu_probe_nxp(c, cpu);
+		break;
++	case PRID_COMP_INGENIC:
 +		cpu_probe_ingenic(c);
 +		break;
- 	default:
- 		c->cputype = CPU_UNKNOWN;
- 	}
+	}
+
+	BUG_ON(!__cpu_name[cpu]);
 --- linux-2.6.24.7.old/arch/mips/mm/c-r4k.c	2008-05-07 01:22:34.000000000 +0200
 +++ linux-2.6.24.7/arch/mips/mm/c-r4k.c	2009-04-12 18:13:57.000000000 +0200
 @@ -874,6 +874,36 @@
  		c->dcache.waybit = 0;
  		break;
- 
+
 +	case CPU_JZRISC:
 +		config1 = read_c0_config1();
 +		config1 = (config1 >> 22) & 0x07;
@@ -29538,19 +29531,19 @@
 +++ linux-2.6.24.7/arch/mips/mm/cache.c	2009-04-12 18:13:57.000000000 +0200
 @@ -47,6 +47,8 @@
  void (*_dma_cache_inv)(unsigned long start, unsigned long size);
- 
+
  EXPORT_SYMBOL(_dma_cache_wback_inv);
 +EXPORT_SYMBOL(_dma_cache_wback);
 +EXPORT_SYMBOL(_dma_cache_inv);
- 
+
  #endif /* CONFIG_DMA_NONCOHERENT */
- 
+
 --- linux-2.6.24.7.old/arch/mips/mm/tlbex.c	2009-04-12 18:05:07.000000000 +0200
 +++ linux-2.6.24.7/arch/mips/mm/tlbex.c	2009-04-12 18:13:57.000000000 +0200
 @@ -981,6 +981,11 @@
  		tlbw(p);
  		break;
- 
+
 +	case CPU_JZRISC:
 +		tlbw(p);
 +		i_nop(p);
