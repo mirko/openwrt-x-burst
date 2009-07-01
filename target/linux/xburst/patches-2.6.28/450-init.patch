@@ -1,0 +1,13 @@
+--- linux-2.6.24.7.old/init/do_mounts.c	2008-05-07 01:22:34.000000000 +0200
++++ linux-2.6.24.7/init/do_mounts.c	2009-04-12 18:13:57.000000000 +0200
+@@ -440,7 +440,9 @@
+ 
+ 	if (saved_root_name[0]) {
+ 		root_device_name = saved_root_name;
+-		if (!strncmp(root_device_name, "mtd", 3)) {
++		if (!strncmp(root_device_name, "mtd", 3) ||
++		    !strncmp(root_device_name, "ubi", 3) ||
++		    !strncmp(root_device_name, "mmc", 3)) {
+ 			mount_block_root(root_device_name, root_mountflags);
+ 			goto out;
+ 		}
