@@ -180,7 +180,7 @@
 +# Commond Ingenic JZ4730 series
 +#
 +core-$(CONFIG_SOC_JZ4730)	+= arch/mips/jz4730/
-+cflags-$(CONFIG_SOC_JZ4730)	+= -Iinclude/asm-mips/mach-jz4730
++cflags-$(CONFIG_SOC_JZ4730)	+= -Iarch/mips/include/asm/mach-jz4730
 +load-$(CONFIG_SOC_JZ4730)	+= 0xffffffff80010000
 +
 +#
@@ -188,7 +188,7 @@
 +#
 +
 +core-$(CONFIG_SOC_JZ4740)	+= arch/mips/jz4740/
-+cflags-$(CONFIG_SOC_JZ4740)	+= -Iinclude/asm-mips/mach-jz4740
++cflags-$(CONFIG_SOC_JZ4740)	+= -Iarch/mips/include/asm/mach-jz4740
 +load-$(CONFIG_SOC_JZ4740)	+= 0xffffffff80010000
 +
 +#
@@ -196,7 +196,7 @@
 +#
 +
 +core-$(CONFIG_SOC_JZ4750)	+= arch/mips/jz4750/
-+cflags-$(CONFIG_SOC_JZ4750)	+= -Iinclude/asm-mips/mach-jz4750
++cflags-$(CONFIG_SOC_JZ4750)	+= -Iarch/mips/include/asm/mach-jz4750
 +load-$(CONFIG_SOC_JZ4750)	+= 0xffffffff80010000
 +
 +#
@@ -204,7 +204,7 @@
 +#
 +
 +core-$(CONFIG_SOC_JZ4750D)	+= arch/mips/jz4750d/
-+cflags-$(CONFIG_SOC_JZ4750D)	+= -Iinclude/asm-mips/mach-jz4750d
++cflags-$(CONFIG_SOC_JZ4750D)	+= -Iarch/mips/include/asm/mach-jz4750d
 +load-$(CONFIG_SOC_JZ4750D)	+= 0xffffffff80010000
 +
 +#
@@ -28743,7 +28743,7 @@
 	}
  }
 
-+static inline void cpu_probe_ingenic(struct cpuinfo_mips *c)
++static inline void cpu_probe_ingenic(struct cpuinfo_mips *c, unsigned int cpu)
 +{
 +	decode_configs(c);
 +	c->options &= ~MIPS_CPU_COUNTER; /* JZRISC does not implement the CP0 counter. */
@@ -28768,7 +28768,7 @@
 		cpu_probe_nxp(c, cpu);
 		break;
 +	case PRID_COMP_INGENIC:
-+		cpu_probe_ingenic(c);
++		cpu_probe_ingenic(c, cpu);
 +		break;
 	}
 
@@ -28831,7 +28831,7 @@
 
 +	case CPU_JZRISC:
 +		tlbw(p);
-+		i_nop(p);
++		uasm_i_nop(p);
 +		break;
 +
  	default:
