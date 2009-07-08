@@ -7,6 +7,16 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/image.mk
 
+ifneq ($(CONFIG_XBURST_UBOOT),)
+  define Build/Clean
+	$(MAKE) -C u-boot clean
+  endef
+
+  define Build/Compile
+	$(MAKE) -C u-boot compile
+  endef
+endif
+
 define Image/BuildKernel
 	cp $(KDIR)/vmlinux.elf $(BIN_DIR)/openwrt-$(BOARD)-vmlinux.elf
 	gzip -9 -c $(KDIR)/vmlinux > $(KDIR)/vmlinux.bin.gz
