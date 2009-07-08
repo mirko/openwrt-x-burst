@@ -1,0 +1,13 @@
+config XBURST_UBOOT
+	bool "Build U-Boot bootloader"
+	depends TARGET_xburst
+	default n
+
+config XBURST_UBOOT_TARGET
+	string "U-Boot target board"
+	depends TARGET_xburst
+	depends XBURST_UBOOT
+	default ""
+	help
+	  For all supported boards there are ready-to-use default
+		configurations available; just type "<board_name>".
