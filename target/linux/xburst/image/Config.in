@@ -7,7 +7,7 @@ config XBURST_UBOOT_TARGET
 	string "U-Boot target board"
 	depends TARGET_xburst
 	depends XBURST_UBOOT
-	default ""
+	default "qi_lb60"
 	help
 	  For all supported boards there are ready-to-use default
 		configurations available; just type "<board_name>".
