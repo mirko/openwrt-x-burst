@@ -1,9 +1,9 @@
---- linux-2.6.24.7.old/arch/mips/include/asm/bootinfo.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/arch/mips/include/asm/bootinfo.h	2009-04-12 18:13:57.000000000 +0200
+--- a/arch/mips/include/asm/bootinfo.h
++++ b/arch/mips/include/asm/bootinfo.h
 @@ -57,6 +57,14 @@
- #define MACH_MIKROTIK_RB532	0	/* Mikrotik RouterBoard 532 	*/
+ #define	MACH_MIKROTIK_RB532	0	/* Mikrotik RouterBoard 532 	*/
  #define MACH_MIKROTIK_RB532A	1	/* Mikrotik RouterBoard 532A 	*/
-
+ 
 +/*
 + * Valid machtype for group INGENIC
 + */
@@ -13,21 +13,21 @@
 +#define  MACH_INGENIC_JZ4750D	3	/* JZ4750D SOC */
 +
  #define CL_SIZE			COMMAND_LINE_SIZE
-
+ 
  extern char *system_type;
---- linux-2.6.24.7.old/arch/mips/include/asm/cpu.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/arch/mips/include/asm/cpu.h	2009-04-12 18:13:57.000000000 +0200
+--- a/arch/mips/include/asm/cpu.h
++++ b/arch/mips/include/asm/cpu.h
 @@ -33,6 +33,7 @@
  #define PRID_COMP_TOSHIBA	0x070000
  #define PRID_COMP_LSI		0x080000
  #define PRID_COMP_LEXRA		0x0b0000
 +#define PRID_COMP_INGENIC	0xd00000
-
-
+ 
+ 
  /*
-@@ -113,6 +114,12 @@
+@@ -114,6 +115,12 @@
  #define PRID_IMP_BCM3302	0x9000
-
+ 
  /*
 + * These are the PRID's for when 23:16 == PRID_COMP_INGENIC
 + */
@@ -37,11 +37,11 @@
 +/*
   * Definitions for 7:0 on legacy processors
   */
-
-@@ -203,6 +210,11 @@
+ 
+@@ -204,6 +211,11 @@ enum cpu_type_enum {
  	 */
  	CPU_5KC, CPU_20KC, CPU_25KF, CPU_SB1, CPU_SB1A, CPU_LOONGSON2,
-
+ 
 +	/*
 +	 * Ingenic class processors
 +	 */
@@ -49,9 +49,9 @@
 +
  	CPU_LAST
  };
-
---- linux-2.6.24.7.old/arch/mips/include/asm/jzsoc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/jzsoc.h	2009-04-12 18:13:57.000000000 +0200
+ 
+--- /dev/null
++++ b/arch/mips/include/asm/jzsoc.h
 @@ -0,0 +1,49 @@
 +/*
 + *  linux/arch/mips/include/asm/jzsoc.h
@@ -102,19 +102,19 @@
 +#define writel(b,addr)	((*(volatile unsigned int *)(addr)) = (b))
 +
 +#endif /* __ASM_JZSOC_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-generic/irq.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-generic/irq.h	2009-04-12 18:13:57.000000000 +0200
+--- a/arch/mips/include/asm/mach-generic/irq.h
++++ b/arch/mips/include/asm/mach-generic/irq.h
 @@ -9,7 +9,7 @@
  #define __ASM_MACH_GENERIC_IRQ_H
-
+ 
  #ifndef NR_IRQS
 -#define NR_IRQS	128
 +#define NR_IRQS	256
  #endif
-
+ 
  #ifdef CONFIG_I8259
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/board-pmp.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/board-pmp.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/board-pmp.h
 @@ -0,0 +1,83 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/board-pmp.h
@@ -199,8 +199,8 @@
 +})
 +
 +#endif /* __ASM_JZ4730_PMP_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/clock.h
 @@ -0,0 +1,184 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/clock.h
@@ -386,8 +386,8 @@
 +}
 +
 +#endif /* __ASM_JZ4730_CLOCK_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/dma.h
 @@ -0,0 +1,272 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/dma.h
@@ -661,8 +661,8 @@
 +}
 +
 +#endif  /* __ASM_JZ4730_DMA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/jz4730.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/jz4730.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/jz4730.h
 @@ -0,0 +1,40 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/jz4730.h
@@ -704,8 +704,8 @@
 +#include <asm/mach-jz4730/serial.h>
 +
 +#endif /* __ASM_JZ4730_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/misc.h
 @@ -0,0 +1,28 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/misc.h
@@ -735,8 +735,8 @@
 +extern int i2c_write(unsigned char, unsigned char *, unsigned char, int);
 +
 +#endif /* __ASM_JZ4730_MISC_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/ops.h
 @@ -0,0 +1,2541 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/ops.h
@@ -3279,8 +3279,8 @@
 +#define __ssi_transmit_data(v)  ( REG_SSI_DR = (v) )
 +
 +#endif /* __ASM_JZ4730_OPS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/regs.h
 @@ -0,0 +1,2550 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/regs.h
@@ -5832,8 +5832,8 @@
 +#define SSI_ITR_IVLTM_MASK	(0x7fff << SSI_ITR_IVLTM_BIT)
 +
 +#endif /* __ASM_JZ4730_REGS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/serial.h
 @@ -0,0 +1,33 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4730/serial.h
@@ -5868,8 +5868,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_JZ4730_SERIAL_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4730/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4730/war.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4730/war.h
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -5896,8 +5896,8 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-dipper.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-dipper.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-dipper.h
 @@ -0,0 +1,69 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/board-dipper.h
@@ -5968,8 +5968,8 @@
 +})
 +
 +#endif /* __ASM_JZ4740_DIPPER_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-leo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-leo.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-leo.h
 @@ -0,0 +1,56 @@
 +#ifndef __ASM_JZ4740_LEO_H__
 +#define __ASM_JZ4740_LEO_H__
@@ -6027,8 +6027,8 @@
 +})
 +
 +#endif /* __ASM_JZ4740_BOARD_LEO_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-lyra.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-lyra.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-lyra.h
 @@ -0,0 +1,70 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/board-lyra.h
@@ -6100,8 +6100,8 @@
 +})
 +
 +#endif /* __ASM_JZ4740_LYRA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-pavo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-pavo.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-pavo.h
 @@ -0,0 +1,70 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/board-pavo.h
@@ -6173,8 +6173,8 @@
 +})
 +
 +#endif /* __ASM_JZ4740_PAVO_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/board-virgo.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/board-virgo.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-virgo.h
 @@ -0,0 +1,67 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/board-virgo.h
@@ -6243,8 +6243,8 @@
 +})
 +
 +#endif /* __ASM_JZ4720_VIRGO_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/clock.h
 @@ -0,0 +1,173 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/clock.h
@@ -6419,8 +6419,8 @@
 +}
 +
 +#endif /* __ASM_JZ4740_CLOCK_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/dma.h
 @@ -0,0 +1,265 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/dma.h
@@ -6687,8 +6687,8 @@
 +}
 +
 +#endif  /* __ASM_JZ4740_DMA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/jz4740.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/jz4740.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/jz4740.h
 @@ -0,0 +1,56 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/jz4740.h
@@ -6746,8 +6746,8 @@
 +#include <asm/mach-jz4740/serial.h>
 +
 +#endif /* __ASM_JZ4740_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/misc.h
 @@ -0,0 +1,43 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/misc.h
@@ -6792,8 +6792,8 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4740_MISC_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/ops.h
 @@ -0,0 +1,2224 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/ops.h
@@ -9019,8 +9019,8 @@
 +
 +
 +#endif /* __JZ4740_OPS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/regs.h
 @@ -0,0 +1,2392 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/regs.h
@@ -11414,8 +11414,8 @@
 +#define USB_CNTL_BURST_16	(3 << 9)
 +
 +#endif /* __JZ4740_REGS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/serial.h
 @@ -0,0 +1,30 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4740/serial.h
@@ -11447,8 +11447,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4740/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4740/war.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/war.h
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -11475,8 +11475,8 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/board-apus.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/board-apus.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/board-apus.h
 @@ -0,0 +1,119 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/board-apus.h
@@ -11597,8 +11597,8 @@
 +})
 +
 +#endif /* __ASM_JZ4750_APUS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/board-fuwa.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/board-fuwa.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/board-fuwa.h
 @@ -0,0 +1,93 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/board-fuwa.h
@@ -11693,8 +11693,8 @@
 +})
 +
 +#endif /* __ASM_JZ4750_FUWA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/clock.h
 @@ -0,0 +1,204 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/clock.h
@@ -11900,8 +11900,8 @@
 +}
 +
 +#endif /* __ASM_JZ4750_CLOCK_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/dma.h
 @@ -0,0 +1,307 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/dma.h
@@ -12210,8 +12210,8 @@
 +}
 +
 +#endif  /* __ASM_JZ4750_DMA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/jz4750.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/jz4750.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/jz4750.h
 @@ -0,0 +1,44 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/jz4750.h
@@ -12257,8 +12257,8 @@
 +#include <asm/mach-jz4750/serial.h>
 +
 +#endif /* __ASM_JZ4750_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/misc.h
 @@ -0,0 +1,44 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/misc.h
@@ -12304,8 +12304,8 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4750_MISC_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/ops.h
 @@ -0,0 +1,3569 @@
 +/*
 + * linux/arch/mips/include/asm/mach-jz4750/ops.h
@@ -15876,8 +15876,8 @@
 +
 +
 +#endif /* __JZ4750_OPS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/regs.h
 @@ -0,0 +1,3411 @@
 +/*
 + * linux/arch/mips/include/asm/mach-jz4750/regs.h
@@ -19290,8 +19290,8 @@
 +
 +
 +#endif /* __JZ4750_REGS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/serial.h
 @@ -0,0 +1,30 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750/serial.h
@@ -19323,8 +19323,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750/war.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750/war.h
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19351,8 +19351,8 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h
 @@ -0,0 +1,124 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/board-fuwa1.h
@@ -19478,8 +19478,8 @@
 +})
 +
 +#endif /* __ASM_JZ4750d_FUWA1_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/clock.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/clock.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/clock.h
 @@ -0,0 +1,230 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/clock.h
@@ -19711,8 +19711,8 @@
 +}
 +
 +#endif /* __ASM_JZ4750D_CLOCK_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/dma.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/dma.h
 @@ -0,0 +1,307 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/dma.h
@@ -20021,8 +20021,8 @@
 +}
 +
 +#endif  /* __ASM_JZ4750D_DMA_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/jz4750d.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/jz4750d.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/jz4750d.h
 @@ -0,0 +1,40 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/jz4750d.h
@@ -20064,8 +20064,8 @@
 +#include <asm/mach-jz4750d/serial.h>
 +
 +#endif /* __ASM_JZ4750_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/misc.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/misc.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/misc.h
 @@ -0,0 +1,44 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/misc.h
@@ -20111,8 +20111,8 @@
 +		     unsigned char address, int count);
 +
 +#endif /* __ASM_JZ4750D_MISC_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/ops.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/ops.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/ops.h
 @@ -0,0 +1,3450 @@
 +/*
 + * linux/arch/mips/include/asm/mach-jz4750d/ops.h
@@ -23564,8 +23564,8 @@
 +
 +
 +#endif /* __JZ4750D_OPS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/regs.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/regs.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/regs.h
 @@ -0,0 +1,3398 @@
 +/*
 + * linux/arch/mips/include/asm/mach-jz4750d/regs.h
@@ -26965,8 +26965,8 @@
 +
 +
 +#endif /* __JZ4750D_REGS_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/serial.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/serial.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/serial.h
 @@ -0,0 +1,30 @@
 +/*
 + *  linux/arch/mips/include/asm/mach-jz4750d/serial.h
@@ -26998,8 +26998,8 @@
 +	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
 +
 +#endif /* __ASM_BORAD_SERIAL_H__ */
---- linux-2.6.24.7.old/arch/mips/include/asm/mach-jz4750d/war.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/mach-jz4750d/war.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4750d/war.h
 @@ -0,0 +1,25 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -27026,23 +27026,23 @@
 +#define MIPS34K_MISSED_ITLB_WAR		0
 +
 +#endif /* __ASM_MIPS_MACH_JZ4740_WAR_H */
---- linux-2.6.24.7.old/arch/mips/include/asm/ptrace.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/arch/mips/include/asm/ptrace.h	2009-04-12 18:13:57.000000000 +0200
-@@ -79,7 +79,7 @@
+--- a/arch/mips/include/asm/ptrace.h
++++ b/arch/mips/include/asm/ptrace.h
+@@ -131,7 +131,7 @@ extern int ptrace_set_watch_regs(struct 
  /*
   * Does the process account for user or for system time?
   */
 -#define user_mode(regs) (((regs)->cp0_status & KU_MASK) == KU_USER)
 +#define user_mode(regs) ((((regs)->cp0_status & KU_MASK) == KU_USER) || (((regs)->cp0_status & 0x08000000) == 0x08000000))
-
+ 
  #define instruction_pointer(regs) ((regs)->cp0_epc)
  #define profile_pc(regs) instruction_pointer(regs)
---- linux-2.6.24.7.old/arch/mips/include/asm/r4kcache.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/arch/mips/include/asm/r4kcache.h	2009-04-12 18:13:57.000000000 +0200
+--- a/arch/mips/include/asm/r4kcache.h
++++ b/arch/mips/include/asm/r4kcache.h
 @@ -17,6 +17,58 @@
  #include <asm/cpu-features.h>
  #include <asm/mipsmtregs.h>
-
+ 
 +#ifdef CONFIG_JZRISC
 +
 +#define K0_TO_K1()				\
@@ -27098,63 +27098,63 @@
  /*
   * This macro return a properly sign-extended address suitable as base address
   * for indexed cache operations.  Two issues here:
-@@ -144,6 +196,7 @@
+@@ -144,6 +196,7 @@ static inline void flush_icache_line_ind
  {
  	__iflush_prologue
  	cache_op(Index_Invalidate_I, addr);
 +	INVALIDATE_BTB();
  	__iflush_epilogue
  }
-
-@@ -151,6 +204,7 @@
+ 
+@@ -151,6 +204,7 @@ static inline void flush_dcache_line_ind
  {
  	__dflush_prologue
  	cache_op(Index_Writeback_Inv_D, addr);
 +	SYNC_WB();
  	__dflush_epilogue
  }
-
-@@ -163,6 +217,7 @@
+ 
+@@ -163,6 +217,7 @@ static inline void flush_icache_line(uns
  {
  	__iflush_prologue
  	cache_op(Hit_Invalidate_I, addr);
 +	INVALIDATE_BTB();
  	__iflush_epilogue
  }
-
-@@ -170,6 +225,7 @@
+ 
+@@ -170,6 +225,7 @@ static inline void flush_dcache_line(uns
  {
  	__dflush_prologue
  	cache_op(Hit_Writeback_Inv_D, addr);
 +	SYNC_WB();
  	__dflush_epilogue
  }
-
-@@ -177,6 +233,7 @@
+ 
+@@ -177,6 +233,7 @@ static inline void invalidate_dcache_lin
  {
  	__dflush_prologue
  	cache_op(Hit_Invalidate_D, addr);
 +	SYNC_WB();
  	__dflush_epilogue
  }
-
-@@ -209,6 +266,7 @@
+ 
+@@ -209,6 +266,7 @@ static inline void flush_scache_line(uns
  static inline void protected_flush_icache_line(unsigned long addr)
  {
  	protected_cache_op(Hit_Invalidate_I, addr);
 +	INVALIDATE_BTB();
  }
-
+ 
  /*
-@@ -220,6 +278,7 @@
+@@ -220,6 +278,7 @@ static inline void protected_flush_icach
  static inline void protected_writeback_dcache_line(unsigned long addr)
  {
  	protected_cache_op(Hit_Writeback_Inv_D, addr);
 +	SYNC_WB();
  }
-
+ 
  static inline void protected_writeback_scache_line(unsigned long addr)
-@@ -396,8 +396,10 @@
+@@ -396,8 +455,10 @@ static inline void blast_##pfx##cache##l
  __BUILD_BLAST_CACHE(d, dcache, Index_Writeback_Inv_D, Hit_Writeback_Inv_D, 16)
  __BUILD_BLAST_CACHE(i, icache, Index_Invalidate_I, Hit_Invalidate_I, 16)
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 16)
@@ -27165,10 +27165,10 @@
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 32)
  __BUILD_BLAST_CACHE(i, icache, Index_Invalidate_I, Hit_Invalidate_I, 64)
  __BUILD_BLAST_CACHE(s, scache, Index_Writeback_Inv_SD, Hit_Writeback_Inv_SD, 64)
-@@ -410,6 +410,114 @@
+@@ -410,6 +471,114 @@ __BUILD_BLAST_CACHE(inv_s, scache, Index
  __BUILD_BLAST_CACHE(inv_s, scache, Index_Writeback_Inv_SD, Hit_Invalidate_SD, 64)
  __BUILD_BLAST_CACHE(inv_s, scache, Index_Writeback_Inv_SD, Hit_Invalidate_SD, 128)
-
+ 
 +#ifdef CONFIG_JZRISC
 +
 +static inline void blast_dcache32(void)
@@ -27280,10 +27280,10 @@
  /* build blast_xxx_range, protected_blast_xxx_range */
  #define __BUILD_BLAST_CACHE_RANGE(pfx, desc, hitop, prot) \
  static inline void prot##blast_##pfx##cache##_range(unsigned long start, \
-@@ -424,13 +593,73 @@
+@@ -431,13 +600,73 @@ static inline void prot##blast_##pfx##ca
  	__##pfx##flush_epilogue						\
  }
-
+ 
 +#ifndef CONFIG_JZRISC
  __BUILD_BLAST_CACHE_RANGE(d, dcache, Hit_Writeback_Inv_D, protected_)
 +#endif
@@ -27296,7 +27296,7 @@
  /* blast_inv_dcache_range */
  __BUILD_BLAST_CACHE_RANGE(inv_d, dcache, Hit_Invalidate_D, )
  __BUILD_BLAST_CACHE_RANGE(inv_s, scache, Hit_Invalidate_SD, )
-
+ 
 +#ifdef CONFIG_JZRISC
 +
 +static inline void protected_blast_dcache_range(unsigned long start,
@@ -27354,8 +27354,8 @@
 +#endif /* CONFIG_JZRISC */
 +
  #endif /* _ASM_R4KCACHE_H */
---- linux-2.6.24.7.old/arch/mips/include/asm/sizes.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.6.24.7/arch/mips/include/asm/sizes.h	2009-04-12 18:13:57.000000000 +0200
+--- /dev/null
++++ b/arch/mips/include/asm/sizes.h
 @@ -0,0 +1,56 @@
 +/*
 + * This program is free software; you can redistribute it and/or modify
@@ -27413,43 +27413,43 @@
 +#endif
 +
 +/*         END */
---- linux-2.6.24.7.old/include/linux/i2c-dev.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/i2c-dev.h	2009-04-12 18:13:57.000000000 +0200
+--- a/include/linux/i2c-dev.h
++++ b/include/linux/i2c-dev.h
 @@ -49,7 +49,8 @@
-
+ 
  #define I2C_PEC		0x0708	/* != 0 to use PEC with SMBus */
  #define I2C_SMBUS	0x0720	/* SMBus transfer */
 -
 +#define I2C_SET_SUB_ADDRESS	0x0730	/* SMBus transfer */
 +#define I2C_SET_CLOCK	0x0731	/* SMBus transfer */
-
+ 
  /* This is the structure as used in the I2C_SMBUS ioctl call */
  struct i2c_smbus_ioctl_data {
-@@ -71,4 +72,5 @@
+@@ -71,4 +72,5 @@ struct i2c_rdwr_ioctl_data {
  #define I2C_MAJOR	89		/* Device major number		*/
  #endif
-
+ 
 +extern void i2c_jz_setclk(unsigned int i2cclk);
  #endif /* _LINUX_I2C_DEV_H */
---- linux-2.6.24.7.old/include/linux/mmc/host.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/mmc/host.h	2009-04-12 18:13:57.000000000 +0200
-@@ -41,6 +41,7 @@
-
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -41,6 +41,7 @@ struct mmc_ios {
+ 
  #define MMC_BUS_WIDTH_1		0
  #define MMC_BUS_WIDTH_4		2
 +#define MMC_BUS_WIDTH_8		4
-
+ 
  	unsigned char	timing;			/* timing specification used */
-
---- linux-2.6.24.7.old/include/linux/mtd/nand.h	2009-04-12 18:05:07.000000000 +0200
-+++ linux-2.6.24.7/include/linux/mtd/nand.h	2009-04-12 18:13:57.000000000 +0200
-@@ -39,14 +39,14 @@
+ 
+--- a/include/linux/mtd/nand.h
++++ b/include/linux/mtd/nand.h
+@@ -37,14 +37,14 @@ extern void nand_release (struct mtd_inf
  extern void nand_wait_ready(struct mtd_info *mtd);
-
+ 
  /* The maximum number of NAND chips in an array */
 -#define NAND_MAX_CHIPS		8
 +#define NAND_MAX_CHIPS		4
-
+ 
  /* This constant declares the max. oobsize / page, which
   * is supported now. If you add a chip with bigger oobsize/page
   * adjust this accordingly.
@@ -27458,10 +27458,10 @@
 -#define NAND_MAX_PAGESIZE	2048
 +#define NAND_MAX_OOBSIZE	256
 +#define NAND_MAX_PAGESIZE	8192
-
+ 
  /*
   * Constants for hardware specific CLE/ALE/NCE function
-@@ -55,6 +55,10 @@
+@@ -53,6 +53,10 @@ extern void nand_wait_ready(struct mtd_i
   * bits in one go.
   */
  /* Select the chip by setting nCE to low */
@@ -27472,7 +27472,7 @@
  #define NAND_NCE		0x01
  /* Select the command latch by setting CLE to high */
  #define NAND_CLE		0x02
-@@ -372,8 +376,8 @@
+@@ -378,8 +382,8 @@ struct nand_chip {
  	void		(*read_buf)(struct mtd_info *mtd, uint8_t *buf, int len);
  	int		(*verify_buf)(struct mtd_info *mtd, const uint8_t *buf, int len);
  	void		(*select_chip)(struct mtd_info *mtd, int chip);
@@ -27483,7 +27483,7 @@
  	void		(*cmd_ctrl)(struct mtd_info *mtd, int dat,
  				    unsigned int ctrl);
  	int		(*dev_ready)(struct mtd_info *mtd);
-@@ -393,12 +397,14 @@
+@@ -399,12 +403,14 @@ struct nand_chip {
  	int		bbt_erase_shift;
  	int		chip_shift;
  	int		numchips;
@@ -27496,10 +27496,10 @@
  	int		badblockpos;
 +	int     	realplanenum; /* number of planes the NAND has */
 +	int     	planenum;     /* number of planes operating synchronously */
-
+ 
  	nand_state_t	state;
-
-@@ -450,7 +456,7 @@
+ 
+@@ -456,7 +462,7 @@ struct nand_flash_dev {
  	char *name;
  	int id;
  	unsigned long pagesize;
@@ -27508,9 +27508,9 @@
  	unsigned long erasesize;
  	unsigned long options;
  };
-@@ -538,13 +544,13 @@
+@@ -544,13 +550,13 @@ struct nand_bbt_descr {
  #define NAND_BBT_SCAN_MAXBLOCKS	4
-
+ 
  extern int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd);
 -extern int nand_update_bbt(struct mtd_info *mtd, loff_t offs);
 +extern int nand_update_bbt(struct mtd_info *mtd, loff_mtd_t offs);
@@ -27523,12 +27523,12 @@
 -			size_t * retlen, uint8_t * buf);
 +extern int nand_do_read(struct mtd_info *mtd, loff_mtd_t from, size_mtd_t len,
 +			size_mtd_t * retlen, uint8_t * buf);
-
+ 
  /*
  * Constants for oob configuration
---- linux-2.6.24.7.old/include/linux/vt.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/linux/vt.h	2009-04-12 18:13:57.000000000 +0200
-@@ -18,10 +18,16 @@
+--- a/include/linux/vt.h
++++ b/include/linux/vt.h
+@@ -18,10 +18,16 @@ extern int unregister_vt_notifier(struct
   * resizing).
   */
  #define MIN_NR_CONSOLES 1       /* must be at least 1 */
@@ -27546,15 +27546,15 @@
 +                  /* Note: the ioctl VT_GETSTATE does not work for
 +		     consoles 16 and higher (since it returns a short) */
 +#endif
-
+ 
  /* 0x56 is 'V', to avoid collision with termios and kd */
-
---- linux-2.6.24.7.old/include/mtd/mtd-abi.h	2009-04-12 18:05:07.000000000 +0200
-+++ linux-2.6.24.7/include/mtd/mtd-abi.h	2009-04-12 18:23:10.000000000 +0200
-@@ -7,9 +7,18 @@
+ 
+--- a/include/mtd/mtd-abi.h
++++ b/include/mtd/mtd-abi.h
+@@ -5,9 +5,18 @@
  #ifndef __MTD_ABI_H__
  #define __MTD_ABI_H__
-
+ 
 +
 +#ifndef __KERNEL__ /* Urgh. The whole point of splitting this out into
 +                   separate files was to avoid #ifdef __KERNEL__ */
@@ -27570,12 +27570,12 @@
 +	uint64_t start;
 +	uint64_t length;
  };
-
+ 
  struct mtd_oob_buf {
-@@ -18,6 +27,14 @@
+@@ -16,6 +25,14 @@ struct mtd_oob_buf {
  	unsigned char __user *ptr;
  };
-
+ 
 +struct mtd_page_buf {
 +	uint32_t start;      //page start address
 +	uint32_t ooblength;
@@ -27587,7 +27587,7 @@
  #define MTD_ABSENT		0
  #define MTD_RAM			1
  #define MTD_ROM			2
-@@ -52,7 +69,7 @@
+@@ -50,7 +67,7 @@ struct mtd_oob_buf {
  struct mtd_info_user {
  	uint8_t type;
  	uint32_t flags;
@@ -27596,16 +27596,16 @@
  	uint32_t erasesize;
  	uint32_t writesize;
  	uint32_t oobsize;   // Amount of OOB data per block (e.g. 16)
-@@ -63,7 +80,7 @@
+@@ -61,7 +78,7 @@ struct mtd_info_user {
  };
-
+ 
  struct region_info_user {
 -	uint32_t offset;		/* At which this region starts,
 +	uint64_t offset;		/* At which this region starts,
  					 * from the beginning of the MTD */
  	uint32_t erasesize;		/* For this region */
  	uint32_t numblocks;		/* Number of blocks in this region */
-@@ -86,8 +103,8 @@
+@@ -84,8 +101,8 @@ struct otp_info {
  #define MEMGETREGIONINFO	_IOWR('M', 8, struct region_info_user)
  #define MEMSETOOBSEL		_IOW('M', 9, struct nand_oobinfo)
  #define MEMGETOOBSEL		_IOR('M', 10, struct nand_oobinfo)
@@ -27616,24 +27616,24 @@
  #define OTPSELECT		_IOR('M', 13, int)
  #define OTPGETREGIONCOUNT	_IOW('M', 14, int)
  #define OTPGETREGIONINFO	_IOW('M', 15, struct otp_info)
-@@ -95,6 +112,7 @@
+@@ -93,6 +110,7 @@ struct otp_info {
  #define ECCGETLAYOUT		_IOR('M', 17, struct nand_ecclayout)
  #define ECCGETSTATS		_IOR('M', 18, struct mtd_ecc_stats)
  #define MTDFILEMODE		_IO('M', 19)
 +#define MEMWRITEPAGE           _IOWR('M', 20, struct mtd_page_buf)
  #define MTDREFRESH		_IO('M', 23)
-
+ 
  /*
-@@ -105,7 +123,7 @@
+@@ -103,7 +121,7 @@ struct nand_oobinfo {
  	uint32_t useecc;
  	uint32_t eccbytes;
  	uint32_t oobfree[8][2];
 -	uint32_t eccpos[32];
 +	uint32_t eccpos[104];
  };
-
+ 
  struct nand_oobfree {
-@@ -120,7 +138,7 @@
+@@ -118,7 +136,7 @@ struct nand_oobfree {
   */
  struct nand_ecclayout {
  	uint32_t eccbytes;
@@ -27642,9 +27642,9 @@
  	uint32_t oobavail;
  	struct nand_oobfree oobfree[MTD_MAX_OOBFREE_ENTRIES];
  };
---- linux-2.6.24.7.old/include/sound/pcm.h	2008-05-07 01:22:34.000000000 +0200
-+++ linux-2.6.24.7/include/sound/pcm.h	2009-04-12 18:13:57.000000000 +0200
-@@ -107,23 +107,23 @@
+--- a/include/sound/pcm.h
++++ b/include/sound/pcm.h
+@@ -112,23 +112,23 @@ struct snd_pcm_ops {
  #define SNDRV_PCM_RATE_5512		(1<<0)		/* 5512Hz */
  #define SNDRV_PCM_RATE_8000		(1<<1)		/* 8000Hz */
  #define SNDRV_PCM_RATE_11025		(1<<2)		/* 11025Hz */
@@ -27670,10 +27670,10 @@
 +#define SNDRV_PCM_RATE_96000		(1<<12)		/* 96000Hz */
 +#define SNDRV_PCM_RATE_176400		(1<<13)		/* 176400Hz */
 +#define SNDRV_PCM_RATE_192000		(1<<14)		/* 192000Hz */
-
+ 
  #define SNDRV_PCM_RATE_CONTINUOUS	(1<<30)		/* continuous range */
  #define SNDRV_PCM_RATE_KNOT		(1<<31)		/* supports more non-continuos rates */
-
+ 
 -#define SNDRV_PCM_RATE_8000_44100	(SNDRV_PCM_RATE_8000|SNDRV_PCM_RATE_11025|\
 -					 SNDRV_PCM_RATE_16000|SNDRV_PCM_RATE_22050|\
 -					 SNDRV_PCM_RATE_32000|SNDRV_PCM_RATE_44100)
