@@ -1,0 +1,474 @@
+From d4dde6f9c5fafdc61fb4254143f8d21b53b5722d Mon Sep 17 00:00:00 2001
+From: Xiangfu Liu <xiangfu.z@gmail.com>
+Date: Fri, 17 Jul 2009 01:10:39 +0800
+Subject: [PATCH] add-qi_lb60-support.patch
+
+---
+ arch/mips/Kconfig                                 |    8 ++
+ arch/mips/include/asm/mach-jz4740/board-qi_lb60.h |   66 ++++++++++++
+ arch/mips/include/asm/mach-jz4740/jz4740.h        |   18 ++--
+ arch/mips/jz4740/Makefile                         |    1 +
+ arch/mips/jz4740/board-qi_lb60.c                  |  114 +++++++++++++++++++++
+ drivers/mtd/nand/jz4740_nand.c                    |   46 ++++++++
+ drivers/video/jzlcd.c                             |   21 ++--
+ drivers/video/jzlcd.h                             |   40 +++++++-
+ 8 files changed, 293 insertions(+), 21 deletions(-)
+ create mode 100644 arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
+ create mode 100644 arch/mips/jz4740/board-qi_lb60.c
+
+diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+index 52cbee5..aa65611 100644
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -35,6 +35,14 @@ config JZ4740_PAVO
+ 	select SYS_SUPPORTS_LITTLE_ENDIAN
+ 	select SOC_JZ4740
+ 
++config JZ4740_QI_LB60
++        bool "Ingenic JZ4740 QI_LB60 board"
++        select DMA_NONCOHERENT
++        select SYS_HAS_CPU_MIPS32_R1
++        select SYS_SUPPORTS_32BIT_KERNEL
++        select SYS_SUPPORTS_LITTLE_ENDIAN
++        select SOC_JZ4740
++
+ config JZ4740_LEO
+ 	bool "Ingenic JZ4740 LEO board"
+ 	select DMA_NONCOHERENT
+diff --git a/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h b/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
+new file mode 100644
+index 0000000..3c63a4e
+--- /dev/null
++++ b/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
+@@ -0,0 +1,66 @@
++/*
++ *  linux/include/asm-mips/mach-jz4740/board-qi_lb60.h
++ *
++ * Copyright (c) 2009 Qi Hardware inc.,
++ * Author: Xiangfu Liu <xiangfu@qi-hardware.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 3 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __ASM_JZ4740_QI_LB60_H__
++#define __ASM_JZ4740_QI_LB60_H__
++
++/*
++ * Frequencies of on-board oscillators
++ */
++#define JZ_EXTAL		12000000  /* Main extal freq: 12 MHz */
++#define JZ_EXTAL2		32768     /* RTC extal freq: 32.768 KHz */
++
++/*
++ * GPIO
++ */
++#define GPIO_SD_VCC_EN_N	98 /* GPD2 */
++#define GPIO_SD_CD_N		96 /* GPD0 */
++#define GPIO_SD_WP		112 /* GPD16 */
++#define GPIO_USB_DETE		124 /* GPD28 */
++#define GPIO_DISP_OFF_N		117 /* GPD21 */
++#define GPIO_LED_EN       	124 
++#define GPIO_DC_DETE_N		100 
++#define GPIO_CHARG_STAT_N	91 /* GPC27 */
++
++#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
++
++/*
++ * MMC/SD
++ */
++#define MSC_WP_PIN		GPIO_SD_WP
++#define MSC_HOTPLUG_PIN		GPIO_SD_CD_N
++#define MSC_HOTPLUG_IRQ		(IRQ_GPIO_0 + GPIO_SD_CD_N)
++
++#define __msc_init_io()				\
++do {						\
++	__gpio_as_output(GPIO_SD_VCC_EN_N);	\
++	__gpio_as_input(GPIO_SD_CD_N);		\
++} while (0)
++
++#define __msc_enable_power()			\
++do {						\
++	__gpio_clear_pin(GPIO_SD_VCC_EN_N);	\
++} while (0)
++
++#define __msc_disable_power()			\
++do {						\
++	__gpio_set_pin(GPIO_SD_VCC_EN_N);	\
++} while (0)
++
++#define __msc_card_detected(s)			\
++({						\
++	int detected = 1;			\
++	if (!__gpio_get_pin(GPIO_SD_CD_N))	\
++		detected = 0;			\
++	detected;				\
++})
++
++#endif /* __ASM_JZ4740_QI_LB60_H__ */
+diff --git a/arch/mips/include/asm/mach-jz4740/jz4740.h b/arch/mips/include/asm/mach-jz4740/jz4740.h
+index 37a02dc..91e98d1 100644
+--- a/arch/mips/include/asm/mach-jz4740/jz4740.h
++++ b/arch/mips/include/asm/mach-jz4740/jz4740.h
+@@ -23,8 +23,13 @@
+ /*------------------------------------------------------------------
+  * Platform definitions
+  */
+-#ifdef CONFIG_JZ4740_PAVO
+-#include <asm/mach-jz4740/board-pavo.h>
++ 
++#ifdef CONFIG_JZ4720_VIRGO
++#include <asm/mach-jz4740/board-virgo.h>
++#endif
++
++#ifdef CONFIG_JZ4725_DIPPER
++#include <asm/mach-jz4740/board-dipper.h>
+ #endif
+ 
+ #ifdef CONFIG_JZ4740_LEO
+@@ -35,17 +40,16 @@
+ #include <asm/mach-jz4740/board-lyra.h>
+ #endif
+ 
+-#ifdef CONFIG_JZ4725_DIPPER
+-#include <asm/mach-jz4740/board-dipper.h>
++#ifdef CONFIG_JZ4740_PAVO
++#include <asm/mach-jz4740/board-pavo.h>
+ #endif
+ 
+-#ifdef CONFIG_JZ4720_VIRGO
+-#include <asm/mach-jz4740/board-virgo.h>
++#ifdef CONFIG_JZ4740_QI_LB60
++#include <asm/mach-jz4740/board-qi_lb60.h>
+ #endif
+ 
+ /* Add other platform definition here ... */
+ 
+-
+ /*------------------------------------------------------------------
+  * Follows are related to platform definitions
+  */
+diff --git a/arch/mips/jz4740/Makefile b/arch/mips/jz4740/Makefile
+index 7592f4e..37aaedc 100644
+--- a/arch/mips/jz4740/Makefile
++++ b/arch/mips/jz4740/Makefile
+@@ -12,6 +12,7 @@ obj-$(CONFIG_PROC_FS)		+= proc.o
+ # board specific support
+ 
+ obj-$(CONFIG_JZ4740_PAVO)	+= board-pavo.o
++obj-$(CONFIG_JZ4740_QI_LB60)	+= board-qi_lb60.o
+ obj-$(CONFIG_JZ4740_LEO)	+= board-leo.o
+ obj-$(CONFIG_JZ4740_LYRA)	+= board-lyra.o
+ obj-$(CONFIG_JZ4725_DIPPER)	+= board-dipper.o
+diff --git a/arch/mips/jz4740/board-qi_lb60.c b/arch/mips/jz4740/board-qi_lb60.c
+new file mode 100644
+index 0000000..ddabb67
+--- /dev/null
++++ b/arch/mips/jz4740/board-qi_lb60.c
+@@ -0,0 +1,114 @@
++/*
++ * linux/arch/mips/jz4740/board-qi_lb60.c
++ *
++ * QI_LB60 setup routines.
++ *
++ * Copyright (c) 2009 Qi Hardware inc.,
++ * Author: Xiangfu Liu <xiangfu@qi-hardware.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 3 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/init.h>
++#include <linux/sched.h>
++#include <linux/ioport.h>
++#include <linux/mm.h>
++#include <linux/console.h>
++#include <linux/delay.h>
++
++#include <asm/cpu.h>
++#include <asm/bootinfo.h>
++#include <asm/mipsregs.h>
++#include <asm/reboot.h>
++
++#include <asm/jzsoc.h>
++
++extern void (*jz_timer_callback)(void);
++
++static void dancing(void)
++{
++	static unsigned int count = 0;
++
++	count ++;
++	count &= 1;
++	/* if (count)
++		__gpio_set_pin(GPIO_LED_EN);
++	else
++		__gpio_clear_pin(GPIO_LED_EN); */
++}
++
++static void pi_timer_callback(void)
++{
++	static unsigned long count = 0;
++
++	if ((++count) % 50 == 0) {
++		dancing();
++		count = 0;
++	}
++}
++
++static void __init board_cpm_setup(void)
++{
++	/* Stop unused module clocks here.
++	 * We have started all module clocks at arch/mips/jz4740/setup.c.
++	 */
++}
++
++static void __init board_gpio_setup(void)
++{
++	/*
++	 * Most of the GPIO pins should have been initialized by the boot-loader
++	 */
++
++	/*
++	 * Initialize MSC pins
++	 */
++	/* __gpio_as_msc(); */
++
++	/*
++	 * Initialize LCD pins
++	 */
++	__gpio_as_lcd_18bit();
++
++	/*
++	 * Initialize SSI pins
++	 */
++	__gpio_as_ssi();
++
++	/*
++	 * Initialize I2C pins
++	 */
++	__gpio_as_i2c();
++
++	/*
++	 * Initialize Other pins
++	 */
++	__gpio_as_output(GPIO_SD_VCC_EN_N);
++	__gpio_clear_pin(GPIO_SD_VCC_EN_N);
++
++	__gpio_as_input(GPIO_SD_CD_N);
++	__gpio_disable_pull(GPIO_SD_CD_N);
++
++	__gpio_as_input(GPIO_SD_WP);
++	__gpio_disable_pull(GPIO_SD_WP);
++
++	__gpio_as_input(GPIO_DC_DETE_N);
++	__gpio_as_input(GPIO_CHARG_STAT_N);
++	__gpio_as_input(GPIO_USB_DETE);
++
++	__gpio_as_output(GPIO_DISP_OFF_N);
++
++	__gpio_as_output(GPIO_LED_EN);
++}
++
++void __init jz_board_setup(void)
++{
++	printk("Qi Hardware JZ4740 QI_LB60 setup\n");
++
++	board_cpm_setup();
++	board_gpio_setup();
++
++	jz_timer_callback = pavo_timer_callback;
++}
+diff --git a/drivers/mtd/nand/jz4740_nand.c b/drivers/mtd/nand/jz4740_nand.c
+index b5d4949..0f012f0 100644
+--- a/drivers/mtd/nand/jz4740_nand.c
++++ b/drivers/mtd/nand/jz4740_nand.c
+@@ -106,6 +106,52 @@ static int partition_reserved_badblocks[] = {
+ 					     20};	/* reserved blocks of mtd5 */
+ #endif /* CONFIG_JZ4740_PAVO */
+ 
++#ifdef CONFIG_JZ4740_QI_LB60
++static struct mtd_partition partition_info[] = {
++	{ name: "NAND BOOT partition",
++	  offset:  0 * 0x100000,
++	  size:    4 * 0x100000,
++	  use_planes: 0 },
++	{ name: "NAND KERNEL partition",
++	  offset:  4 * 0x100000,
++	  size:    4 * 0x100000,
++	  use_planes: 0 },
++	{ name: "NAND ROOTFS partition",
++	  offset:  8 * 0x100000,
++	  size:    504 * 0x100000,
++	  use_planes: 0 },
++	{ name: "NAND DATA1 partition",
++	  offset:  512 * 0x100000,
++	  size:    512 * 0x100000,
++	  use_planes: 1 },
++	{ name: "NAND DATA2 partition",
++	  offset:  1024 * 0x100000,
++	  size:    512 * 0x100000,
++	  use_planes: 1 },
++	{ name: "NAND VFAT partition",
++	  offset:  (1024 + 512) * 0x100000,
++	  size:    512 * 0x100000,
++	  use_planes: 1 },
++};
++
++/* Define max reserved bad blocks for each partition.
++ * This is used by the mtdblock-jz.c NAND FTL driver only.
++ *
++ * The NAND FTL driver reserves some good blocks which can't be
++ * seen by the upper layer. When the bad block number of a partition
++ * exceeds the max reserved blocks, then there is no more reserved
++ * good blocks to be used by the NAND FTL driver when another bad
++ * block generated.
++ */
++static int partition_reserved_badblocks[] = {
++					     2,		/* reserved blocks of mtd0 */
++					     2,		/* reserved blocks of mtd1 */
++					     10,	/* reserved blocks of mtd2 */
++					     10,	/* reserved blocks of mtd3 */
++					     10,	/* reserved blocks of mtd4 */
++					     20};	/* reserved blocks of mtd5 */
++#endif /* CONFIG_JZ4740_QI_LB60 */
++
+ #ifdef CONFIG_JZ4740_LEO
+ static struct mtd_partition partition_info[] = {
+ 	{ name: "NAND BOOT partition",
+diff --git a/drivers/video/jzlcd.c b/drivers/video/jzlcd.c
+index 7297661..beb61c7 100644
+--- a/drivers/video/jzlcd.c
++++ b/drivers/video/jzlcd.c
+@@ -126,15 +126,18 @@ static struct jzfb_info jzfb = {
+ 	MODE_TFT_GEN | HSYNC_N | VSYNC_N | PCLK_N | DE_N,
+ 	320, 240, 16, 60, 3, 3, 3, 3, 3, 85 /* 320x240 */
+ #endif
+-#if defined(CONFIG_JZLCD_FOXCONN_PT035TN01) && defined(CONFIG_JZ4740_PAVO)
+-	MODE_TFT_GEN | HSYNC_N | VSYNC_N | MODE_TFT_18BIT | PCLK_N,
+-//	320, 240, 18, 110, 1, 1, 10, 50, 10, 13
+-	320, 240, 18, 80, 1, 1, 10, 50, 10, 13
+-#endif
+-#if defined(CONFIG_JZLCD_FOXCONN_PT035TN01) && !(defined(CONFIG_JZ4740_PAVO))
+-	MODE_TFT_GEN | HSYNC_N | VSYNC_N  | PCLK_N,
+-	320, 240, 16, 110, 1, 1, 10, 50, 10, 13
+-#endif
++#if defined(CONFIG_JZLCD_FOXCONN_PT035TN01)
++        #if defined(CONFIG_JZ4740_PAVO)
++                MODE_TFT_GEN | HSYNC_N | VSYNC_N | MODE_TFT_18BIT | PCLK_N,
++                320, 240, 18, 80, 1, 1, 10, 50, 10, 13
++        #elif defined(CONFIG_JZ4740_QI_LB60)
++                MODE_8BIT_SERIAL_TFT | PCLK_N | HSYNC_N | VSYNC_N,
++                320, 240, 32, 70, 1, 1, 273, 140, 1, 20
++        #else
++                MODE_TFT_GEN | HSYNC_N | VSYNC_N | PCLK_N,
++                320, 240, 16, 110, 1, 1, 10, 50, 10, 13
++        #endif
++#endif  /* CONFIG_JZLCD_FOXCONN_PT035TN01 */
+ #if defined(CONFIG_JZLCD_INNOLUX_PT035TN01_SERIAL)
+ 	MODE_8BIT_SERIAL_TFT | PCLK_N | HSYNC_N | VSYNC_N,
+ 	320, 240, 32, 60, 1, 1, 10, 50, 10, 13
+diff --git a/drivers/video/jzlcd.h b/drivers/video/jzlcd.h
+index c53a339..0ba57b9 100644
+--- a/drivers/video/jzlcd.h
++++ b/drivers/video/jzlcd.h
+@@ -1,4 +1,4 @@
+-/*
++#/*
+  * linux/drivers/video/jzlcd.h -- Ingenic On-Chip LCD frame buffer device
+  *
+  * Copyright (C) 2005-2007, Ingenic Semiconductor Inc.
+@@ -359,12 +359,16 @@ do { \
+ 
+ #endif	/* CONFIG_JZLCD_AUO_A030FL01_V1 */
+ 
+-//#if defined(CONFIG_JZLCD_FOXCONN_PT035TN01)
+ #if defined(CONFIG_JZLCD_FOXCONN_PT035TN01) || defined(CONFIG_JZLCD_INNOLUX_PT035TN01_SERIAL)
+ 
+ #if defined(CONFIG_JZLCD_FOXCONN_PT035TN01) /* board pmp */
++#if defined(CONFIG_JZ4740_QI_LB60)
++#define MODE 0xc9
++#else
+ #define MODE 0xcd 		/* 24bit parellel RGB */
+ #endif
++#endif
++
+ #if defined(CONFIG_JZLCD_INNOLUX_PT035TN01_SERIAL)
+ #define MODE 0xc9		/* 8bit serial RGB */
+ #endif
+@@ -384,6 +388,11 @@ do { \
+ 	#define SPCK	(32*1+17)       //LCD_CLS
+ 	#define SPDA	(32*2+12)       //LCD_D12
+ 	#define LCD_RET (32*2+23)       //LCD_REV, GPC23
++#elif defined(CONFIG_JZ4740_QI_LB60)
++        #define SPEN    (32*2+21)       //LCD_SPL
++        #define SPCK    (32*2+23)       //LCD_CLS
++        #define SPDA    (32*2+22)       //LCD_D12
++        #define LCD_RET (32*3+27) 
+ #if 0  /*old driver*/
+ 	#define SPEN	(32*1+18)       //LCD_SPL
+ 	#define SPCK	(32*1+17)       //LCD_CLS
+@@ -653,7 +662,6 @@ do { \
+ 
+ #endif /* CONFIG_JZ4730_PMP */
+ 
+-/*#if defined(CONFIG_JZ4740_LEO) || defined(CONFIG_JZ4740_PAVO)*/
+ #if defined(CONFIG_SOC_JZ4740)
+ #if defined(CONFIG_JZ4740_PAVO) || defined(CONFIG_JZ4740_LYRA)
+ #define GPIO_PWM    123		/* GP_D27 */
+@@ -708,11 +716,32 @@ __gpio_as_output(GPIO_PWM); \
+ __gpio_clear_pin(GPIO_PWM); \
+ } while (0)
+ 
++#elif defined(CONFIG_JZ4740_QI_LB60)
++#define GPIO_PWM 123 /* GP_D27 */
++#define PWM_CHN 4    /* pwm channel */
++#define PWM_FULL 101
++#define __lcd_set_backlight_level(n)\
++do { \
++__gpio_as_output(32*3+27); \
++__gpio_set_pin(32*3+27); \
++} while (0)
++
++#define __lcd_close_backlight() \
++do { \
++__gpio_as_output(GPIO_PWM); \
++__gpio_clear_pin(GPIO_PWM); \
++} while (0)
++#define __lcd_display_pin_init() \
++do { \
++        __gpio_as_output(GPIO_DISP_OFF_N); \
++        __cpm_start_tcu(); \
++        __lcd_special_pin_init(); \
++} while (0) /* CONFIG_MIPS_JZ4740_QI_LB60) */
+ #else
+ #define __lcd_set_backlight_level(n)
+ #define __lcd_close_backlight()
+ 
+-#endif /* #if defined(CONFIG_MIPS_JZ4740_PAVO) */
++#endif 
+ 
+ #define __lcd_display_pin_init() \
+ do { \
+@@ -735,7 +764,7 @@ do { \
+ 	__gpio_clear_pin(GPIO_DISP_OFF_N); \
+ } while (0)
+ 
+-#endif /* CONFIG_MIPS_JZ4740_LEO */
++#endif /* (CONFIG_SOC_JZ4740) */
+ 
+ #if defined(CONFIG_JZLCD_MSTN_240x128)
+ 
+@@ -772,6 +801,7 @@ static void vsync_irq(int irq, void *dev_id, struct pt_regs *reg)
+ /* We uses AC BIAs pin to generate VCOM signal, so above code should be removed.
+  */
+ #endif
++
+ /*****************************************************************************
+  * LCD display pin dummy macros
+  *****************************************************************************/
+-- 
+1.6.0.4
+

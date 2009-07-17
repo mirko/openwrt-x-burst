@@ -1,0 +1,317 @@
+From 8d4c06f1ab21f5a20b5968704a06b9fb2d690a8f Mon Sep 17 00:00:00 2001
+From: Xiangfu Liu <xiangfu.z@gmail.com>
+Date: Fri, 17 Jul 2009 01:54:58 +0800
+Subject: [PATCH] qi_lb60-lcd-mmc.patch
+
+---
+ arch/mips/include/asm/mach-jz4740/board-qi_lb60.h |   32 +++++++++----
+ arch/mips/include/asm/mach-jz4740/serial.h        |    9 +++-
+ arch/mips/jz4740/board-qi_lb60.c                  |   50 ++++++++++++++------
+ drivers/char/jzchar/poweroff.c                    |    2 -
+ drivers/video/jzlcd.c                             |    9 ++--
+ drivers/video/jzlcd.h                             |   46 +++++--------------
+ 6 files changed, 81 insertions(+), 67 deletions(-)
+
+diff --git a/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h b/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
+index 3c63a4e..0027fa3 100644
+--- a/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
++++ b/arch/mips/include/asm/mach-jz4740/board-qi_lb60.h
+@@ -21,16 +21,30 @@
+ /*
+  * GPIO
+  */
+-#define GPIO_SD_VCC_EN_N	98 /* GPD2 */
+-#define GPIO_SD_CD_N		96 /* GPD0 */
+-#define GPIO_SD_WP		112 /* GPD16 */
+-#define GPIO_USB_DETE		124 /* GPD28 */
+-#define GPIO_DISP_OFF_N		117 /* GPD21 */
+-#define GPIO_LED_EN       	124 
+-#define GPIO_DC_DETE_N		100 
+-#define GPIO_CHARG_STAT_N	91 /* GPC27 */
++#define GPIO_DC_DETE_N          (2 * 32 + 26)
++#define GPIO_CHARG_STAT_N       (2 * 32 + 27)
++#define GPIO_LED_EN             (2 * 32 + 28)
+ 
+-#define GPIO_UDC_HOTPLUG	GPIO_USB_DETE
++#define GPIO_LCD_CS             (2 * 32 + 21)
++#define GPIO_DISP_OFF_N         (3 * 32 + 21)
++#define GPIO_PWM                (3 * 32 + 27)
++
++#define GPIO_AMP_EN             (3 * 32 + 4)
++
++#define GPIO_SD_CD_N            (3 * 32 + 0)
++#define GPIO_SD_VCC_EN_N        (3 * 32 + 2)
++#define GPIO_SD_WP              (3 * 32 + 16)
++
++#define GPIO_USB_DETE           (3 * 32 + 28)
++#define GPIO_BUZZ_PWM           (3 * 32 + 27)
++#define GPIO_UDC_HOTPLUG        GPIO_USB_DETE
++
++#define GPIO_AUDIO_POP          (1 * 32 + 29)
++#define GPIO_COB_TEST           (1 * 32 + 30)
++
++#define GPIO_KEYOUT_BASE        (2 * 32 + 10)
++#define GPIO_KEYIN_BASE         (3 * 32 + 18)
++#define GPIO_KEYIN_8            (3 * 32 + 26)
+ 
+ /*
+  * MMC/SD
+diff --git a/arch/mips/include/asm/mach-jz4740/serial.h b/arch/mips/include/asm/mach-jz4740/serial.h
+index e702f32..8584943 100644
+--- a/arch/mips/include/asm/mach-jz4740/serial.h
++++ b/arch/mips/include/asm/mach-jz4740/serial.h
+@@ -23,8 +23,11 @@
+ #define JZ_BASE_BAUD	(12000000/16)
+ 
+ #define JZ_SERIAL_PORT_DEFNS \
+-	{ .baud_base = JZ_BASE_BAUD, .irq = IRQ_UART0, \
+-	  .flags = STD_COM_FLAGS, .iomem_base = (u8 *)UART0_BASE, \
+-	  .iomem_reg_shift = 2, .io_type = SERIAL_IO_MEM },
++	{ .baud_base = JZ_BASE_BAUD, \
++	  .irq = IRQ_UART0, \
++	  .flags = STD_COM_FLAGS, \
++	  .iomem_base = (u8 *)UART0_BASE, \
++	  .iomem_reg_shift = 2, \
++	  .io_type = SERIAL_IO_MEM },
+ 
+ #endif /* __ASM_BORAD_SERIAL_H__ */
+diff --git a/arch/mips/jz4740/board-qi_lb60.c b/arch/mips/jz4740/board-qi_lb60.c
+index ddabb67..75ac2c6 100644
+--- a/arch/mips/jz4740/board-qi_lb60.c
++++ b/arch/mips/jz4740/board-qi_lb60.c
+@@ -33,13 +33,13 @@ static void dancing(void)
+ 
+ 	count ++;
+ 	count &= 1;
+-	/* if (count)
++	if (count)
+ 		__gpio_set_pin(GPIO_LED_EN);
+ 	else
+-		__gpio_clear_pin(GPIO_LED_EN); */
++		__gpio_clear_pin(GPIO_LED_EN);
+ }
+ 
+-static void pi_timer_callback(void)
++static void qi_timer_callback(void)
+ {
+ 	static unsigned long count = 0;
+ 
+@@ -61,31 +61,51 @@ static void __init board_gpio_setup(void)
+ 	/*
+ 	 * Most of the GPIO pins should have been initialized by the boot-loader
+ 	 */
+-
+ 	/*
+-	 * Initialize MSC pins
+-	 */
+-	/* __gpio_as_msc(); */
++         * Initialize UART0 pins
++         */
++	/* __gpio_as_uart0(); */
+ 
+ 	/*
+ 	 * Initialize LCD pins
+ 	 */
+-	__gpio_as_lcd_18bit();
++	/* __gpio_as_lcd_18bit(); */
+ 
+ 	/*
+ 	 * Initialize SSI pins
+ 	 */
+-	__gpio_as_ssi();
++	/* __gpio_as_ssi(); */
+ 
+ 	/*
+ 	 * Initialize I2C pins
+ 	 */
+-	__gpio_as_i2c();
++	/* __gpio_as_i2c(); */
++
++	/*
++	 * Initialize MSC pins
++	 */
++	/* __gpio_as_msc(); */
+ 
+ 	/*
+ 	 * Initialize Other pins
+ 	 */
++
++	/* unsigned int i;
++	for (i = 0; i < 8; i++) {
++		__gpio_as_output(GPIO_KEYOUT_BASE + i);
++		__gpio_set_pin(GPIO_KEYOUT_BASE + i);
++	}
++
++	for (i = 0; i < 7; i++){
++		__gpio_as_input(GPIO_KEYIN_BASE + i);
++		__gpio_enable_pull(GPIO_KEYIN_BASE + i);
++	}
++	__gpio_as_input( GPIO_KEYIN_8 );
++	__gpio_enable_pull( GPIO_KEYIN_8 );
++	*/
++
+ 	__gpio_as_output(GPIO_SD_VCC_EN_N);
++	__gpio_disable_pull(GPIO_SD_VCC_EN_N);
+ 	__gpio_clear_pin(GPIO_SD_VCC_EN_N);
+ 
+ 	__gpio_as_input(GPIO_SD_CD_N);
+@@ -94,13 +114,13 @@ static void __init board_gpio_setup(void)
+ 	__gpio_as_input(GPIO_SD_WP);
+ 	__gpio_disable_pull(GPIO_SD_WP);
+ 
++
+ 	__gpio_as_input(GPIO_DC_DETE_N);
+ 	__gpio_as_input(GPIO_CHARG_STAT_N);
+-	__gpio_as_input(GPIO_USB_DETE);
+-
+-	__gpio_as_output(GPIO_DISP_OFF_N);
+ 
+-	__gpio_as_output(GPIO_LED_EN);
++	/* __gpio_as_output(GPIO_DISP_OFF_N); */
++	/* __gpio_as_input(GPIO_USB_DETE); */
++	/* __gpio_as_output(GPIO_LED_EN); */
+ }
+ 
+ void __init jz_board_setup(void)
+@@ -110,5 +130,5 @@ void __init jz_board_setup(void)
+ 	board_cpm_setup();
+ 	board_gpio_setup();
+ 
+-	jz_timer_callback = pavo_timer_callback;
++	jz_timer_callback = qi_timer_callback;
+ }
+diff --git a/drivers/char/jzchar/poweroff.c b/drivers/char/jzchar/poweroff.c
+index dfbd4b0..7127438 100644
+--- a/drivers/char/jzchar/poweroff.c
++++ b/drivers/char/jzchar/poweroff.c
+@@ -78,8 +78,6 @@ do { \
+ 	    SET_POWEROFF_PIN_AS_IRQ;\
+ 	}
+ 
+-#define GPIO_DISP_OFF_N		118
+-#define GPIO_PWM    123
+ #define __lcd_close_backlight() \
+ do { \
+ __gpio_as_output(GPIO_PWM); \
+diff --git a/drivers/video/jzlcd.c b/drivers/video/jzlcd.c
+index beb61c7..4f729f9 100644
+--- a/drivers/video/jzlcd.c
++++ b/drivers/video/jzlcd.c
+@@ -1501,7 +1501,7 @@ static int __init jzfb_init(void)
+ 	}
+ 
+ 	__lcd_enable_ofu_intr(); /* enable OutFifo underrun */
+-//	__lcd_enable_ifu0_intr(); /* needn't enable InFifo underrun */
++	/* __lcd_enable_ifu0_intr(); */ /* needn't enable InFifo underrun */
+ 
+ #if defined(CONFIG_JZLCD_FRAMEBUFFER_ROTATE_SUPPORT)
+ 	jzfb_rotate_change(rotate_angle);
+@@ -1526,8 +1526,7 @@ static int __init jzfb_init(void)
+ 		cfb->pm->data = cfb;
+ #endif
+ 
+-	__lcd_display_on();
+-
++	__lcd_display_off();
+ 	return 0;
+ 
+ failed:
+@@ -1563,8 +1562,8 @@ static void __exit jzfb_cleanup(void)
+ #if defined(CONFIG_JZLCD_FRAMEBUFFER_ROTATE_SUPPORT)
+ 	kthread_stop(jzlcd_info->rotate_daemon_thread);
+ #endif
+-//	driver_unregister(&jzfb_driver);
+-//	jzfb_remove();
++	/* driver_unregister(&jzfb_driver); */
++	/* jzfb_remove(); */
+ }
+ 
+ module_init(jzfb_init);
+diff --git a/drivers/video/jzlcd.h b/drivers/video/jzlcd.h
+index 0ba57b9..45def90 100644
+--- a/drivers/video/jzlcd.h
++++ b/drivers/video/jzlcd.h
+@@ -663,21 +663,21 @@ do { \
+ #endif /* CONFIG_JZ4730_PMP */
+ 
+ #if defined(CONFIG_SOC_JZ4740)
+-#if defined(CONFIG_JZ4740_PAVO) || defined(CONFIG_JZ4740_LYRA)
+-#define GPIO_PWM    123		/* GP_D27 */
+-#define PWM_CHN 4    /* pwm channel */
+-#define PWM_FULL 101
++#if defined(CONFIG_JZ4740_PAVO) || defined(CONFIG_JZ4740_LYRA) || defined(CONFIG_JZ4740_QI_LB60)
++#define GPIO_PWM	123 /* GP_D27 */
++#define PWM_CHN		4 /* pwm channel */
++#define PWM_FULL	101
+ /* 100 level: 0,1,...,100 */
+ #define __lcd_set_backlight_level(n)\
+ do { \
+-__gpio_as_output(32*3+27); \
+-__gpio_set_pin(32*3+27); \
++	__gpio_as_output(GPIO_PWM); \
++	__gpio_set_pin(GPIO_PWM); \
+ } while (0)
+ 
+ #define __lcd_close_backlight() \
+ do { \
+-__gpio_as_output(GPIO_PWM); \
+-__gpio_clear_pin(GPIO_PWM); \
++	__gpio_as_output(GPIO_PWM); \
++	__gpio_clear_pin(GPIO_PWM); \
+ } while (0)
+ 
+ #elif defined(CONFIG_JZ4720_VIRGO)
+@@ -712,32 +712,12 @@ do {							\
+ 
+ #define __lcd_close_backlight() \
+ do { \
+-__gpio_as_output(GPIO_PWM); \
+-__gpio_clear_pin(GPIO_PWM); \
+-} while (0)
+-
+-#elif defined(CONFIG_JZ4740_QI_LB60)
+-#define GPIO_PWM 123 /* GP_D27 */
+-#define PWM_CHN 4    /* pwm channel */
+-#define PWM_FULL 101
+-#define __lcd_set_backlight_level(n)\
+-do { \
+-__gpio_as_output(32*3+27); \
+-__gpio_set_pin(32*3+27); \
++	__gpio_as_output(GPIO_PWM);		\
++	__gpio_clear_pin(GPIO_PWM);		\
+ } while (0)
+ 
+-#define __lcd_close_backlight() \
+-do { \
+-__gpio_as_output(GPIO_PWM); \
+-__gpio_clear_pin(GPIO_PWM); \
+-} while (0)
+-#define __lcd_display_pin_init() \
+-do { \
+-        __gpio_as_output(GPIO_DISP_OFF_N); \
+-        __cpm_start_tcu(); \
+-        __lcd_special_pin_init(); \
+-} while (0) /* CONFIG_MIPS_JZ4740_QI_LB60) */
+ #else
++
+ #define __lcd_set_backlight_level(n)
+ #define __lcd_close_backlight()
+ 
+@@ -749,12 +729,12 @@ do { \
+ 	__cpm_start_tcu(); \
+ 	__lcd_special_pin_init(); \
+ } while (0)
+-/*	__lcd_set_backlight_level(100); \*/
++
+ #define __lcd_display_on() \
+ do { \
+ 	__gpio_set_pin(GPIO_DISP_OFF_N); \
+ 	__lcd_special_on(); \
+-	__lcd_set_backlight_level(80); \
++	__lcd_set_backlight_level(20); \
+ } while (0)
+ 
+ #define __lcd_display_off() \
+-- 
+1.6.0.4
+

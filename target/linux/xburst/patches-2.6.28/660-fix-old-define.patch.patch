@@ -1,0 +1,128 @@
+From 7ffdc4a4a3640440674ccbee9a670f3b283ca9fc Mon Sep 17 00:00:00 2001
+From: Xiangfu Liu <xiangfu.z@gmail.com>
+Date: Fri, 17 Jul 2009 13:32:23 +0800
+Subject: [PATCH] fix-old-define.patch
+
+---
+ drivers/mmc/host/jz_mmc.c |   20 +++++++++++++-------
+ drivers/video/jzlcd.c     |    5 ++---
+ drivers/video/jzlcd.h     |    1 -
+ 3 files changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/mmc/host/jz_mmc.c b/drivers/mmc/host/jz_mmc.c
+index 67781da..971dbe0 100644
+--- a/drivers/mmc/host/jz_mmc.c
++++ b/drivers/mmc/host/jz_mmc.c
+@@ -23,7 +23,6 @@
+ #include <linux/mm.h>
+ #include <linux/signal.h>
+ #include <linux/pm.h>
+-#include <linux/pm_legacy.h>
+ #include <linux/scatterlist.h>
+ 
+ #include <asm/io.h>
+@@ -755,8 +754,11 @@ static const struct mmc_host_ops jz_mmc_ops = {
+ 	.get_ro = jz_mmc_get_ro,
+ 	.set_ios = jz_mmc_set_ios,
+ };
++#if 0
++/* will fix this later add by Xiangfu Liu*/
+ static int jz_mmc_pm_callback(struct pm_dev *pm_dev,
+ 			      pm_request_t req, void *data);
++#endif
+ 
+ static int jz_mmc_probe(struct platform_device *pdev)
+ {
+@@ -817,7 +819,7 @@ static int jz_mmc_probe(struct platform_device *pdev)
+ 	mmc->ocr_avail = host->pdata ?
+ 		host->pdata->ocr_mask : MMC_VDD_32_33 | MMC_VDD_33_34;
+ 	host->mmc->caps =
+-		MMC_CAP_4_BIT_DATA | MMC_CAP_MULTIWRITE | MMC_CAP_SD_HIGHSPEED
++		MMC_CAP_4_BIT_DATA | MMC_CAP_SD_HIGHSPEED
+ 		| MMC_CAP_MMC_HIGHSPEED;
+ 	/*
+ 	 *MMC_CAP_4_BIT_DATA    (1 << 0)    The host can do 4 bit transfers
+@@ -874,9 +876,9 @@ static int jz_mmc_probe(struct platform_device *pdev)
+ 	mmc_add_host(mmc);
+ #ifdef CONFIG_PM
+ 	/* Register MMC slot as as power-managed device */
+-	host->pmdev = pm_register(PM_UNKNOWN_DEV, PM_SYS_UNKNOWN, jz_mmc_pm_callback);
+-	if (host->pmdev)
+-		host->pmdev->data = pdev;
++	/* host->pmdev = pm_register(PM_UNKNOWN_DEV, PM_SYS_UNKNOWN, jz_mmc_pm_callback); */
++	/* if (host->pmdev) */
++	/* 	host->pmdev->data = pdev; */
+ #endif
+ 	printk("JZ SD/MMC card driver registered\n");
+ 
+@@ -975,16 +977,18 @@ static int jz_mmc_resume(struct platform_device *dev)
+ 
+ 	return ret;
+ }
++#if 0
++/* will fix this later add by Xiangfu Liu*/
+ static int jz_mmc_pm_callback(struct pm_dev *pm_dev,
+                                pm_request_t req, void *data)
+ {
+ 	struct platform_device *pdev = (struct platform_device *)pm_dev->data;
+ 
+ 	switch(req) {
+-	case PM_RESUME:
++	case PM_EVENT_RESUME:
+ 		jz_mmc_resume(pdev);
+ 		break;
+-	case PM_SUSPEND:
++	case PM_EVENT_SUSPEND:
+ 	/* state has no use */
+ 		jz_mmc_suspend(pdev, state);
+ 		break;
+@@ -994,6 +998,8 @@ static int jz_mmc_pm_callback(struct pm_dev *pm_dev,
+ 	}
+ 	return 0;
+ }
++#endif 
++
+ #else
+ #define jz_mmc_suspend	NULL
+ #define jz_mmc_resume	NULL
+diff --git a/drivers/video/jzlcd.c b/drivers/video/jzlcd.c
+index 4f729f9..172d5b2 100644
+--- a/drivers/video/jzlcd.c
++++ b/drivers/video/jzlcd.c
+@@ -22,7 +22,6 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm.h>
+-#include <linux/pm_legacy.h>
+ #include <linux/kthread.h>
+ 
+ #include <asm/irq.h>
+@@ -1428,11 +1427,11 @@ static int jzlcd_pm_callback(struct pm_dev *pm_dev, pm_request_t req, void *data
+ 	if (!cfb) return -EINVAL;
+ 
+ 	switch (req) {
+-	case PM_SUSPEND:
++	case PM_EVENT_SUSPEND:
+ 		ret = jzfb_suspend();
+ 		break;
+ 
+-	case PM_RESUME:
++	case PM_EVENT_RESUME:
+ 		ret = jzfb_resume();
+ 		break;
+ 
+diff --git a/drivers/video/jzlcd.h b/drivers/video/jzlcd.h
+index 45def90..3414c5d 100644
+--- a/drivers/video/jzlcd.h
++++ b/drivers/video/jzlcd.h
+@@ -664,7 +664,6 @@ do { \
+ 
+ #if defined(CONFIG_SOC_JZ4740)
+ #if defined(CONFIG_JZ4740_PAVO) || defined(CONFIG_JZ4740_LYRA) || defined(CONFIG_JZ4740_QI_LB60)
+-#define GPIO_PWM	123 /* GP_D27 */
+ #define PWM_CHN		4 /* pwm channel */
+ #define PWM_FULL	101
+ /* 100 level: 0,1,...,100 */
+-- 
+1.6.0.4
+
